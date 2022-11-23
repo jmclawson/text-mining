@@ -1,0 +1,45 @@
+project:
+  type: website
+
+website:
+  title: "Literary Text Mining"
+  favicon: noun-hard-hat-pink.png
+  navbar:
+    logo: noun-hard-hat-smaller.png
+    right:
+      - text: "Slides"
+        menu: 
+          - href: intro-to-text-analysis.qmd
+            text: Introduction to Text Analysis
+      - text: "Course Units"
+        menu: 
+            - href: intro.qmd
+              text: "1. Introduction: Visualizing Data with R (not yet written)"
+            - href: basics.qmd
+              text: "2. Basics: Working with R and Quarto (not yet written)"
+            - href: filter-transform-summarize.qmd
+              text: "3. Filtering, Transforming, and Summarizing Tables"
+            - href: import-pivot-join.qmd
+              text: "4. Importing, Pivoting, and Combining Data Sets"
+            - href: exam-review.qmd
+              text: "Unit 3 Exam Review"
+      - about.qmd
+  page-footer: "Copyright 2022, James Clawson" 
+  repo-url: https://github.com/jmclawson/gramda-site
+  repo-actions: [source]
+
+format:
+  html:
+    theme: 
+      light: [cosmo, custom.scss]
+      dark: [darkly, custom-dark.scss]
+    highlight-style: "github"
+    code-link: true
+    css: styles.css
+    toc: true
+    toc-location: left
+    number-sections: true
+    df-print: paged
+
+editor: visual
+

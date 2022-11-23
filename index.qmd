@@ -1,0 +1,14 @@
+---
+title: "Digital Methods for Literary Text Mining"
+format:
+  html:
+    toc: false
+    toc-location: body
+    number-sections: false
+---
+
+For newspapers, social media, product reviews, and poetry, text is the medium of meaning. But its unstructured format demands unique strategies for bringing order to chaos: discovering general information, identifying distinctive details, recognizing topics or themes, and evaluating sentiment. In this project-based course, students will use tools and methods of data analysis to ask questions about texts and communicate the answers. Students will learn progressively complex applications of text data mining to understand the information that can be found within sets of documents. With special emphasis on literary texts, the course will also discuss and provide opportunities to study the relevance of text mining to fields like public health, business, science, and security.
+
+## Links
+
+-   coming soon
