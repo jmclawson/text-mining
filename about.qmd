@@ -5,7 +5,6 @@ format:
     toc: false
 ---
 
-
 ## Acknowledgments and Attributions
 
 Hard Hat logo by Matthew Davis from <a href="https://thenounproject.com/browse/icons/term/hard-hat/" target="_blank" title="Hard Hat Icons">Noun Project</a>
