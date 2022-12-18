@@ -19,7 +19,7 @@ format:
 
 ## Government Sources
 
--   [Apollo 13 Transcript](appendix/data/apollo13.rds)
+-   [Apollo 13 Transcript](data/apollo13.rds)
 -   EPA Incident Reports
 
 ## Commercial and Other Sources

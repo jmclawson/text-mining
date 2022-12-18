@@ -350,8 +350,8 @@ apollo13 <- apollo13 |>
 apollo13
 ```
 
-Now we have a very rich data set for text mining. Saving it in its final form means it can be downloaded directly: [apollo13.rds](data/apollo13.rds).
+Now we have a very rich data set for text mining. Saving it in its final form means it can be downloaded directly: [apollo13.rds](../data/apollo13.rds).
 
 ```{r}
-saveRDS(apollo13, "data/apollo13.rds")
+saveRDS(apollo13, "../data/apollo13.rds")
 ```
