@@ -1,38 +1,59 @@
 project:
   type: website
+  resources: 
+    - ".htaccess"
 
 website:
   title: "Literary Text Mining"
+  site-path: "/text-mining/"
+  site-url: "https://jmclawson.net/text-mining/"
   favicon: noun-hard-hat-pink.png
+  page-navigation: true
   navbar:
     logo: noun-hard-hat-smaller.png
+    left:
+      - href: syllabus.qmd
+        text: "Syllabus"
+      - href: overview.qmd
+        text: "Overview"
+      - href: texts.qmd
+        text: "Texts"
     right:
+      - text: "Units"
+        menu: 
+          - href: foundations/
+            text: "Foundations of Text Mining with R"
+          - href: features/
+            text: "Mining for Simple Features"
+          - href: sentiment/
+            text: "Sentiment Analysis"
+          - href: classification/
+            text: "Text Classification"
+          - href: topic/
+            text: "Topic Modeling"
       - text: "Slides"
         menu: 
-          - href: intro-to-text-analysis.qmd
+          - href: slides/intro-to-text-analysis.qmd
             text: Introduction to Text Analysis
-      - text: "Course Units"
-        menu: 
-            - href: intro.qmd
-              text: "1. Introduction: Visualizing Data with R (not yet written)"
-            - href: basics.qmd
-              text: "2. Basics: Working with R and Quarto (not yet written)"
-            - href: filter-transform-summarize.qmd
-              text: "3. Filtering, Transforming, and Summarizing Tables"
-            - href: import-pivot-join.qmd
-              text: "4. Importing, Pivoting, and Combining Data Sets"
-            - href: exam-review.qmd
-              text: "Unit 3 Exam Review"
       - about.qmd
+
+  # sidebar:
+  #   - id: units
+  #     title: "Units"
+  #     style: "docked"
+  #     background: light
+  #     collapse-level: 2
+  #     contents: units
+
   page-footer: "Copyright 2022, James Clawson" 
-  repo-url: https://github.com/jmclawson/gramda-site
+  repo-url: https://github.com/jmclawson/text-mining
   repo-actions: [source]
 
 format:
   html:
     theme: 
       light: [cosmo, custom.scss]
-      dark: [darkly, custom-dark.scss]
+      dark: [cosmo, custom-dark.scss]
     highlight-style: "github"
     code-link: true
     css: styles.css
@@ -40,6 +61,17 @@ format:
     toc-location: left
     number-sections: true
     df-print: paged
+  
+  revealjs:
+    code-link: true
+    toc: false
+    theme: [moon, slides-custom.scss]
+    highlight-style: dracula
+    number-sections: false
+    echo: true
+    incremental: true
+    slide-number: true
+    chalkboard: true
 
 editor: visual
 

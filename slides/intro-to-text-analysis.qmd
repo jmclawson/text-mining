@@ -1,0 +1,54 @@
+---
+title: "Introduction to <br> Text Analysis"
+author: "James Clawson"
+format:
+  revealjs:
+    incremental: false
+editor: visual
+---
+
+## Why dedicate an entire course to text analytics?
+
+-   Text is unlike other data.
+-   Not structured. Not numeric.
+-   Meaningfully ordered. Meaningful units.
+-   Each kind of data deserves its own approach.
+
+# There are many ways to analyze text.
+
+## Counting words
+
+-   Basically, count the words.
+-   "Bag of words"
+-   Returns: Most- / Least-used words
+-   Caveat: Is every word useful?
+
+## Weighting words
+
+-   Find weights for each term dependent on each document.
+-   Term frequency--Inverse document frequency (tf-idf)
+-   Returns: Words that differentiate documents
+-   Caveat: Shared traits ignored among similar documents.
+
+## Categorizing words
+
+-   Compare each word to a "dictionary" to find its value.
+-   Sentiment analysis
+-   Returns: Values from a predetermined set of categories.
+-   Caveat: Depends on quality of dictionary, which must be made.
+
+## Parsing words
+
+-   Treat words as language, parsing for grammar or stems.
+-   Natural Language Processing (NLP)
+-   Returns: Grammatical part of speech, lemmas, stems, and more.
+-   Caveat: Machine-learning technique = complicated.
+
+## Contextualizing words
+
+-   Identify words around each word to find similarities.
+-   Word Vector Models and Topic Models
+-   Returns: Semantic proximities and topic distributions.
+-   Caveats:
+    -   More advanced machine-learning technique = more complicated and slow.
+    -   Interpreting results = complicated, too.

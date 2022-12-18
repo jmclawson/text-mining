@@ -1,15 +1,19 @@
 /*-- scss:defaults --*/
-$primary: #EB00A0;
+$brightpink: #FB11B1;
+$blackpink: #430030;
+$darkblackpink: #220020;
+$darkerblackpink: #210010;
+$primary: $blackpink;
 $secondary: #FF6600;
 $notwhite: #FFDCF5; 
 $white: #FFFAFE;
-$black: #220020;
+$black: $darkerblackpink;
 
+$link-color: $brightpink;
 $body-bg: $black;
-$code-block-bg: mix($black, #ffffff, 15%);
+$code-block-bg: $darkblackpink;
 $code-bg: $code-block-bg;
-
-$headings-font-weight:      400 !default;
+$body-color: $white;
 
 /*-- scss:rules --*/
 div.sourceCode:has(+ div.cell-output), div.sourceCode:has(+ div.cell-output-display) {
@@ -17,9 +21,14 @@ div.sourceCode:has(+ div.cell-output), div.sourceCode:has(+ div.cell-output-disp
   margin-bottom: 0px;
 }
 
+.cell-output-display img {
+  filter: invert(1);
+}
+
 div.sourceCode, div.sourceCode:has(+ div.cell-output-display p img){
   border-radius: 7px;
   border: 1px solid rgba(133,136,139,.65);
+  background-color: $darkblackpink;
 }
 
 .cell-output pre code, div.cell-output-display div.pagedtable-wrapper {
@@ -28,6 +37,7 @@ div.sourceCode, div.sourceCode:has(+ div.cell-output-display p img){
   border-radius: 0 0 7px 7px;
   background-color: lighten(#282a36, 78%);
   background-color: #fdfdfd;
+  background-color: $darkblackpink;
 }
 
 div.cell-output:has(+ div.cell-output-display) pre {
@@ -63,7 +73,7 @@ div.callout-header {
 }
 
 #quarto-appendix.default {
-  background-color: $white;
+  background-color: $black;
 }
 
 #quarto-content > * {
@@ -77,12 +87,16 @@ div.callout-header {
     }
 }
 
+h1 {
+  text-align: center;
+}
+
 header + p::first-letter {
   float: left;
   line-height: 35px;
   font-size: 55px;
   font-family: Serif;
-  color: $primary;
+  color: $brightpink;
   border: solid $notwhite;
   padding-top: 5px;
   padding-bottom: 5px;

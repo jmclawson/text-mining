@@ -1,5 +1,8 @@
 /*-- scss:defaults --*/
 $primary: #EB00A0;
+$blackpink: #430030;
+$darkblackpink: #220020;
+$darkerblackpink: #210010;
 $secondary: #FF6600;
 $notwhite: #FFDCF5; 
 $white: #FFFAFE;
@@ -7,6 +10,8 @@ $white: #FFFAFE;
 $body-bg: $white;
 $code-block-bg: mix($white, #ffffff, 15%);
 $code-bg: $code-block-bg;
+$body-color: $blackpink;
+
 /*-- scss:rules --*/
 div.sourceCode:has(+ div.cell-output), div.sourceCode:has(+ div.cell-output-display) {
   border-radius: 7px 7px 0 0;
@@ -24,6 +29,11 @@ div.sourceCode, div.sourceCode:has(+ div.cell-output-display p img){
   border-radius: 0 0 7px 7px;
   background-color: lighten(#282a36, 78%);
   background-color: #fdfdfd;
+}
+
+details + .cell-output pre code, details + div.cell-output-display div.pagedtable-wrapper {
+  border: 1px solid rgba(133,136,139,.65);
+  border-radius: 7px;
 }
 
 div.cell-output:has(+ div.cell-output-display) pre {
@@ -71,6 +81,10 @@ div.callout-header {
     #quarto-content > * {
          padding-top: 1em; 
     }
+}
+
+h1 {
+  text-align: center;
 }
 
 header + p::first-letter {

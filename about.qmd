@@ -3,8 +3,12 @@ title: "About"
 format:
   html:
     toc: false
+    toc-location: body
+    number-sections: false
 ---
 
 ## Acknowledgments and Attributions
 
 Hard Hat logo by Matthew Davis from <a href="https://thenounproject.com/browse/icons/term/hard-hat/" target="_blank" title="Hard Hat Icons">Noun Project</a>
+
+Text sets sourced from University of North Carolina's [*Documenting the American South*](https://docsouth.unc.edu/docsouthdata/) project include The Church in the Southern Black Community, First-Person Narratives of the American South, Library of Southern Literature, and North American Slave Narratives.

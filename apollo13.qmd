@@ -1,0 +1,357 @@
+---
+title: "Houston, We Have a Transcript"
+---
+
+On April 11, 1970, astronauts in the Apollo 13 mission launched on a mission to land on the moon. Two days later, they encountered a setback. As they hurled away from Earth at thousands of miles per hour, an explosion in an oxygen tank threatened their life support and damaged control systems in part of the shuttle. Their transmission to NASA was to the point: "Houston, we've had a problem."
+
+Over the next few hours, the teams were able to improvise a solution allowing them to slingshot around the moon and return safely to Earth. More than 100 hours of radio transmissions were recorded, later transcribed here in a format we can analyze.
+
+## Liftoff
+
+The Apollo 13 transcript needs a little work to read it into R. As always, we'll start by loading the necessary packages and scripts.
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+source("helper.R")
+```
+
+With that out of the way, we'll use the `get_if_needed()` function to download the transcript just once, saving it locally in the "data" folder:
+
+```{r}
+get_if_needed("https://www.hq.nasa.gov/alsj/a13/AS13_TEC.txt")
+```
+
+It's not a bad idea to open this text file to see what's in it. When we do, we see that the top of the file is filled with background information, and that things don't actually start until after line 260. We can use `read_lines()` to read the file into R, setting the `skip` argument to skip the first 260 lines of text.
+
+```{r}
+apollo <- 
+  read_lines("data/AS13_TEC.txt", 
+             skip = 260)
+
+head(apollo)
+```
+
+Looking at the first few lines, we can see that things are broken up for each radio broadcast, with the time stamp and initials of the speaker on one line, the text on the next line, and a blank on the third line. This pattern persists for the entire vector, with a third of the items including the time and speaker, a third of the items including what they said, and a third of the strings being empty. This isn't a very "tidy" way of organizing things, so we'll process it a little to get it into a structured format. My ideal data structure looks something like this:
+
+| timestamp | speaker | text                  |
+|-----------|---------|-----------------------|
+| 000:00:02 | CDR     | The clock is running. |
+| 000:00:03 | CMP     | Okay. P11, Jim.       |
+| 000:00:05 | CDR     | Yaw program.          |
+
+It'll take some massaging to get things into this format.
+
+## Thinking Small
+
+Our data set is pretty big, with more than 10,000 transmissions back and forth from ground control in Houston to the astronauts in space. This is a lot to handle at once, so I'm going to work with a smaller subset of the data to figure out how to strategize my cleaning and structuring. I'll also collapse the vector of data into a single string so that I can manipulate it with something like a fancy "find and replace." We'll set collapse to `\n` because that means "new line" in computer speak:
+
+```{r}
+small <- apollo |> 
+  head(12) |> 
+  paste(collapse = "\n")
+
+small
+```
+
+From here, we can begin to strategize. We know that the `\n\n` combination after "running." indicates two line breaks in a row, so we'll use that to separate things up at the very end. We can also see that the time stamp always follows a pattern of three numeric digits, colon, two numeric digits, colon, and two numeric digits, followed by a space. Likewise, the speaker is designated by 1, 2, or 3 capital letters followed by a single `\n`, and the text starts right after that. But the numbers are always changing---how can I tell the computer to find any numbers that match the pattern described here?
+
+### Regular Expressions
+
+Knowing this pattern, we can use "regular expressions" to extract pieces of the text. For instance, if I wanted to delete every time stamp, I could do it like this:
+
+```{r}
+small |> 
+  str_replace_all(
+    pattern = "[0-9]{3}:[0-9]{2}:[0-9]{2} ",
+    replacement = "")
+```
+
+The gobbledigook in the `pattern` argument is a regular expression. Once you know how to understand it, it looks less daunting:
+
+-   Items in the square brackets indicate the *kind* of data being looked for. Here, `[0-9]` means we're looking for numbers between 0 and 9.
+
+-   Numbers in the curly brackets indicate *how many* of that type of data we're looking for. So `{3}` means to match exactly three characters, and `{2}` means to match exactly two.
+
+-   When we write `[0-9]{3}`, we're saying that we're looking for three-digit numbers. And outside of the brackets, the colons and the space will be matched exactly as they're written. So when we write `[0-9]{3}:[0-9]{2}:[0-9]{2}` we're saying that we're looking for a three-digit number, a colon, a two-digit number, a colon, and a two-digit number followed by a space.
+
+Once the code finds text matching that pattern, it replaces it with everything in the `replacement` argument. Here, we've replaced it with `""` (or nothing).
+
+But say I don't want to delete the time stamps, but to modify them. In that case, "capture groups" make it possible to manipulate things in pieces. I'm going to replace every space after the time stamp with the special character `\t`, which is computer speak for "tab." (I could use any special character, but I want to make sure it's one that isn't used elsewhere in the document.) Pay attention here to the use of parentheses in the pattern argument, and parts like `\\1` and `\\2` in the `replacement` argument
+
+```{r}
+small |> 
+  str_replace_all(
+    pattern = "([0-9]{3}:[0-9]{2}:[0-9]{2}) ",
+    replacement = "\\1\t")
+```
+
+I can devise a similar pattern to replace the `\n` between the speaker's initials and the text:
+
+```{r}
+small |> 
+  str_replace_all(
+    pattern = "([0-9]{3}:[0-9]{2}:[0-9]{2}) ",
+    replacement = "\\1\t") |> 
+  str_replace_all(
+    pattern = "([A-Z]{1,3})\n([A-Z])",
+    replacement = "\\1\t\\2")
+```
+
+In the last step, above, the first capture group looks like this: `[A-Z]{1,3}`. This means, it's looking for uppercase letters, ranging in sequence from at least 1 to at most 3 characters. This sequence needs to be followed by `\n` and that sequence needs to be followed by another uppercase letter.
+
+Breaking it up into two steps like this works for the first few lines, but we can imagine a scenario in which the first thing spoken in a broadcast is actually a number, and not a capital letter. So it might be better to combine the two `str_replace_all()` steps into one:
+
+```{r}
+small |> 
+  str_replace_all(
+    "([0-9]{3}:[0-9]{2}:[0-9]{2}) ([A-Z]{1,3})\n",
+    "\\1\t\\2\t")
+```
+
+Finally, since I've studied the data a little more closely, I know that some of the speaker's designations also include things like hyphens and numbers, so I'll tweak the second capture group a little to find them all. I'll also save my process at this point to make subsequent steps easier to follow:
+
+```{r}
+small <- small |> 
+  str_replace_all(
+    "([0-9]{3}:[0-9]{2}:[0-9]{2}) ([A-Z]{1,3}|[A-Z]{1}-[l12]{1})\n",
+    "\\1\t\\2\t")
+
+small
+```
+
+Now that each broadcast has clear delineation among its parts, we can split up each line to be its own item in a vector. The `strsplit()` function lets us split strings up into lists, breaking them at every certain step. We'll break ours at every `\n\n`, and then `unlist()` things as shown here:
+
+```{r}
+small <- small |> 
+  strsplit("\n\n") |> 
+  unlist()
+
+small
+```
+
+Things are beginning to be easier to see!
+
+### Adding Structure
+
+Now that each broadcast is its own item in a list, we can read the vector into a new data frame and name the column "list".
+
+```{r}
+small <- small |> 
+  data.frame() |> 
+  setNames("list")
+
+small
+```
+
+From here, the `separate()` function lets us split the "list" column into columns called "time", "speaker", and "text", by separating at every tab `\t` character:
+
+```{r}
+small |> 
+  separate(
+    list, 
+    into = c("time", "speaker", "text"),
+    sep = "\t")
+```
+
+This is *exactly* what I want.
+
+## Looming Large
+
+So far, we've been working with a small subset of data, but we really want to do it with the whole `apollo` data set. This last code chunk combines all the steps in one:
+
+```{r}
+#| warning: false
+apollo <- 
+  read_lines("data/AS13_TEC.txt", 
+             skip = 260) |> 
+  paste(collapse = "\n") |> 
+  str_replace_all(
+    "([0-9]{3}:[0-9]{2}:[0-9]{2}) ([A-Z]{1,3}|[A-Z]{1}-[l12]{1})\n",
+    "\\1\t\\2\t") |> 
+  strsplit("\n\n") |> 
+  unlist() |> 
+  data.frame() |> 
+  setNames("line") |> 
+  separate(
+    line, 
+    into=c("time", 
+           "speaker",
+           "text"), 
+    sep = "\t")
+  
+apollo
+```
+
+From this point, there's plenty we could do with the text column. We could, for instance, compare the broadcasts from ground control with those from the astronauts to see what kinds of words or phrases each used. By adding a column of sentiment scores, we could track everyone's feelings about the mission over time to see whether the failed oxygen tank changed the mood in a notable way.
+
+But before doing any of this, let's add a little more polish.
+
+## Changing the Clocks
+
+The time column shows a running count of hours, minutes, and seconds since takeoff. Since we know when the shuttle was launched, give or take a minute, we can convert this column to show the date and time of each communication. Unfortunately, the time stamp is reported in a different format for the last three transmissions, so correcting things is kind of a messy process. The code here is hidden out of embarrassment, but it can be toggled to visible.
+
+```{r}
+#| warning: false
+#| code-fold: true
+apollo13 <- apollo |> 
+  # The last three rows have their times
+  # reported in a different format, so they
+  # need personalized attention, fixing
+  # their speaker, text, and time columns
+  mutate(
+    speaker = case_when(
+      is.na(speaker) ~ time |> 
+        # Choose characters 13 through 15
+        substr(13, 15),
+      TRUE ~ speaker),
+    text = case_when(
+      is.na(text) ~ time |> 
+        # Choose characters 17 through end
+        substr(17, 1000000),
+      TRUE ~ text),
+    time = case_when(
+      !str_detect(time, ":") ~ time |>
+        # Choose the first 11 characters
+        substr(1, 11),
+      TRUE ~ time)
+    ) |> 
+  # Divide the "time" column into components
+  separate(
+    time,
+    sep = ":",
+    into = c("hours", 
+             "minutes", 
+             "seconds")) |> 
+  # Fix the time parts of the last 3 rows
+  mutate(
+    minutes = case_when(
+      str_detect(hours, " ") ~ hours |> 
+        # split at spaces
+        strsplit(" ") |> 
+        # choose the third item (minutes)
+        lapply({\(x) as.numeric(x[3])}) |> 
+        unlist(),
+      TRUE ~ as.numeric(minutes)
+    ),
+    seconds = case_when(
+      str_detect(hours, " ") ~ hours |> 
+        # split at spaces
+        strsplit(" ") |> 
+        # choose the fourth item (seconds)
+        lapply({\(x) as.numeric(x[4])}) |> 
+        unlist(),
+      TRUE ~ as.numeric(seconds)
+    ),
+    hours = case_when(
+      str_detect(hours, " ") ~ hours |> 
+        # split at spaces
+        strsplit(" ") |> 
+        # choose the first item (days), 
+        # and multiply it times 24 to 
+        # convert it to hours, then add
+        # it to the second item (hours)
+        lapply({\(x) as.numeric(x[1])*24 + as.numeric(x[2])}) |> 
+        unlist(),
+      TRUE ~ as.numeric(hours))) |> 
+  # Convert all times to seconds, then add
+  # these seconds to the launch time.
+  mutate(
+    total_seconds = 
+      seconds + 
+      minutes*60 + 
+      hours*60*60,
+    date = as.POSIXct("1970-04-11 13:13:00") +
+      total_seconds) |> 
+  # Rearrange and remove unneeded columns.
+  relocate(date) |> 
+  select(-c(total_seconds, hours,
+            minutes, seconds))
+
+apollo13
+```
+
+## Adding the cast
+
+As a final step, the speaker column hides a lot of interesting information. Usually two or three letters, it's an abbreviation of the speaker's role in the mission, which also can indicate who the speaker was and where they were broadcasting from. Extra columns will fill in this information. This code chunk is easy to understand, but it's long, so I'm hiding it, too.
+
+```{r}
+#| code-fold: true
+# Create a table of the spacecraft crew
+crew_spacecraft <- 
+  tibble(
+    abbreviation = 
+      c("CDR", "CMP", "LMP", "SC", "MS"),
+    role = 
+      c("Commander", "Command module pilot",
+        "Lunar module pilot", NA, NA),
+    name = 
+      c("James A. Lovell, Jr.",
+        "John L. Swigert, Jr.",
+        "Fred W. Haise, Jr.",
+        "Unidentified crewmember", 
+        "Multiple speakers"),
+    location = "Spacecraft"
+  )
+
+# Create a table of the crew in Mission Control
+crew_houston <- 
+  tibble(
+    abbreviation = 
+      c("CC", "LCC", "F", "S"),
+    role = 
+      c("Capsule communicator",
+        "Launch Control Center", 
+        "Flight director", 
+        "Surgeon"),
+    name = NA,
+    location = "Mission Control"
+  )
+
+# Create a table of the remote crew
+crew_remote <- 
+  tibble(
+    abbreviation = 
+      c("AB", "CT", "IWO", 
+        "P", "P-1", "P-2",
+        "R", "R-1", "R-2",
+        "S-1", "S-2"),
+    role = 
+      c("Airboss",
+        "Communications technician", 
+        "USS Iwo Jima", 
+        "Photographic helicopter",
+        "Photographic helicopter",
+        "Photographic helicopter",
+        "Recovery helicopter",
+        "Recovery helicopter",
+        "Recovery helicopter",
+        "Recovery Swimmer",
+        "Recovery Swimmer"),
+    name = NA,
+    location = "Remote"
+  )
+
+# Stick them all together
+crew <- rbind(crew_spacecraft, 
+              crew_houston,
+              crew_remote) |> 
+  mutate(location = factor(location))
+
+# Add the new columns to the original data
+apollo13 <- apollo13 |> 
+  # Fix some typos in speaker list
+  mutate(speaker = speaker |> 
+           str_replace_all("-l", "-1")) |> 
+  left_join(crew,
+            by = c("speaker" = "abbreviation"))
+
+apollo13
+```
+
+Now we have a very rich data set for text mining. Saving it in its final form means it can be downloaded directly: [apollo13.rds](data/apollo13.rds).
+
+```{r}
+saveRDS(apollo13, "data/apollo13.rds")
+```

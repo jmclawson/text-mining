@@ -1,0 +1,51 @@
+---
+title: "Syllabus"
+format:
+  html:
+    toc: false
+    toc-location: body
+    number-sections: false
+---
+
+## Objectives
+
+By the end of this course, students will be able to
+
+-   demonstrate understanding of some common approaches to text mining with R.
+-   apply these text mining strategies to understand literary and other texts.
+-   explain similarities and differences within groups of texts.
+-   combine multiple techniques in a student-designed project.
+-   use appropriate visualizations to communicate findings.
+
+::: columns
+::: {.column width="40%"}
+## Assignment weights
+
+-   40% - Four projects
+-   30% - Weekly assignments
+-   20% - Final project
+-   10% - Participation
+:::
+
+::: {.column width="10%"}
+<!-- empty column to create gap -->
+:::
+
+::: {.column width="40%"}
+## Grading scale
+
+-   A - 90--100%
+-   B - 80--89%
+-   C - 70--79%
+-   D - 60--69%
+-   F - 0--59%
+:::
+:::
+
+## Data Diversity
+
+This English course is designed to introduce students to a broad set of methods for text data mining used in many different fields. In order to earn a passing grade, students must show engagement with different kinds of data: at least one project must explore literary texts, and at least one project must explore non-literary texts.
+
+## Learning Activities
+
+Readings, lectures, quizzes, projects, other assignments

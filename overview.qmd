@@ -1,0 +1,37 @@
+---
+title: "Overview"
+format:
+  html:
+    toc: false
+    toc-location: body
+    number-sections: false
+---
+
+## I. [Foundations of Text Mining with R](foundations/)
+
+-   Review: Using R and RStudio
+-   From Page to Table: Adding Structure Where It Wasn't
+-   [Houston, We Have Text Data](apollo13.qmd)
+
+## II. [Mining for Simple Features](features/)
+
+-   Text in Context: Finding Needles in Haystacks
+-   Counts, Clouds, and Columns: Moving from Words to Numbers
+-   NLP Transformations: Treating Words as Words
+
+## III. [Sentiment Analysis](sentiment/)
+
+-   Sentiment at Large: Measuring Document-Level Sentiment
+-   Sentiment over Time: Finding the Plot
+
+## IV. [Text Classification](classification/)
+
+-   Multidimensional Measures: Kissing the Joy as it Flies
+-   Similarity and Difference: Calculating Distance between Texts
+-   Clustering and Classifying: Finding K-Nearest Neighbors
+-   Visualizing High-Dimensional Data: Using Hierarchical Clusters and Principal Components Analysis
+
+## V. [Topic Modeling](topic/)
+
+-   Tf-idf: Distinguishing among Documents
+-   Topic Modeling: Identifying Common Threads across Documents

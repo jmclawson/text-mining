@@ -7,8 +7,13 @@ format:
     number-sections: false
 ---
 
-For newspapers, social media, product reviews, and poetry, text is the medium of meaning. But its unstructured format demands unique strategies for bringing order to chaos: discovering general information, identifying distinctive details, recognizing topics or themes, and evaluating sentiment. In this project-based course, students will use tools and methods of data analysis to ask questions about texts and communicate the answers. Students will learn progressively complex applications of text data mining to understand the information that can be found within sets of documents. With special emphasis on literary texts, the course will also discuss and provide opportunities to study the relevance of text mining to fields like public health, business, science, and security.
+The world is full of text. From newspapers to websites and social media, from product reviews to personal messaging, from movie scripts to novels and poetry---text is the medium of meaning. But this ubiquity doesn't make it easy to work with. Unlike numbers (which line up their digits) and tables (which pace out rows and columns), text is unstructured, ranging from ropy sentences to shorter clips, unexpectedly terse. Text surprises. It demands unique strategies for bringing structure to chaos, discovering, processing, and analyzing information buried within piles of words.
+
+In this project-based course, students will use tools and methods of data analysis to ask questions about texts and communicate the answers. Students will learn progressively complex applications of text data mining to extract useful data from sets of documents. With special emphasis on literary study, the course will also provide opportunities to study the relevance of text mining to fields like environmental protection, public health, business, science, and security.
 
 ## Links
 
--   coming soon
+-   [Syllabus](syllabus.qmd)
+-   [Overview](overview.qmd)
+-   [Texts](texts.qmd)
+-   [About](about.qmd)
