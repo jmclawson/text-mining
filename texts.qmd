@@ -19,7 +19,7 @@ format:
 
 ## Government Sources
 
--   [Apollo 13 Transcript](https://www.hq.nasa.gov/alsj/a13/AS13_TEC.txt)
+-   [Apollo 13 Transcript](appendix/data/apollo13.rds)
 -   EPA Incident Reports
 
 ## Commercial and Other Sources

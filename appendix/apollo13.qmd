@@ -14,7 +14,7 @@ The Apollo 13 transcript needs a little work to read it into R. As always, we'll
 #| label: setup
 #| message: false
 library(tidyverse)
-source("helper.R")
+source("../helper.R")
 ```
 
 With that out of the way, we'll use the `get_if_needed()` function to download the transcript just once, saving it locally in the "data" folder:
@@ -272,7 +272,7 @@ apollo13 <- apollo |>
 apollo13
 ```
 
-## Adding the cast
+## Adding the Crew
 
 As a final step, the speaker column hides a lot of interesting information. Usually two or three letters, it's an abbreviation of the speaker's role in the mission, which also can indicate who the speaker was and where they were broadcasting from. Extra columns will fill in this information. This code chunk is easy to understand, but it's long, so I'm hiding it, too.
 

@@ -1,5 +1,5 @@
 ---
-title: "About"
+title: "About this Site"
 format:
   html:
     toc: false
@@ -7,8 +7,14 @@ format:
     number-sections: false
 ---
 
-## Acknowledgments and Attributions
+## Acknowledgements
 
-Hard Hat logo by Matthew Davis from <a href="https://thenounproject.com/browse/icons/term/hard-hat/" target="_blank" title="Hard Hat Icons">Noun Project</a>
+## Attributions
+
+Hard Hat logo by Matthew Davis from [Noun Project](https://thenounproject.com/browse/icons/term/hard-hat/).
+
+Original [transcripts](https://www.hq.nasa.gov/alsj/a13/AS13_TEC.txt) from the Apollo 13 mission are sourced from NASA's [*Apollo 13 Lunar Surface Journal*](https://www.hq.nasa.gov/alsj/a13/a13.html).
 
 Text sets sourced from University of North Carolina's [*Documenting the American South*](https://docsouth.unc.edu/docsouthdata/) project include The Church in the Southern Black Community, First-Person Narratives of the American South, Library of Southern Literature, and North American Slave Narratives.
+
+Photo by <a href="https://unsplash.com/@lemonvlad?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Vladislav Klapin</a> on <a href="https://unsplash.com/s/photos/introduction?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>

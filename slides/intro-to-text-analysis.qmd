@@ -5,6 +5,10 @@ format:
   revealjs:
     incremental: false
 editor: visual
+image: vladislav-klapin-SymZoeE8quA-unsplash.jpg
+title-slide-attributes:
+    data-background-image: vladislav-klapin-SymZoeE8quA-unsplash.jpg
+    data-background-opacity: "0.5"
 ---
 
 ## Why dedicate an entire course to text analytics?

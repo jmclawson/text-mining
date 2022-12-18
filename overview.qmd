@@ -11,7 +11,6 @@ format:
 
 -   Review: Using R and RStudio
 -   From Page to Table: Adding Structure Where It Wasn't
--   [Houston, We Have Text Data](apollo13.qmd)
 
 ## II. [Mining for Simple Features](features/)
 
@@ -35,3 +34,7 @@ format:
 
 -   Tf-idf: Distinguishing among Documents
 -   Topic Modeling: Identifying Common Threads across Documents
+
+## VI. [Appendices](appendix/)
+
+-   [Houston, We Have a Transcript](appendix/apollo13.qmd)

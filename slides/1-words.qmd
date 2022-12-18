@@ -1,9 +1,0 @@
----
-title: "Bags of Words"
----
-
-## Description
-
-## Schedule
-
-## Assignments
