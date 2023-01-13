@@ -1,5 +1,11 @@
 ---
 title: "Houston, We Have a Transcript"
+categories: 
+  - data cleaning
+  - regular expressions
+order: 1
+description: "Preparing a data set of transcribed radio transmissions from the Apollo 13 mission."
+freeze: true
 ---
 
 On April 11, 1970, astronauts in the Apollo 13 mission launched on a mission to land on the moon. Two days later, they encountered a setback. As they hurled away from Earth at thousands of miles per hour, an explosion in an oxygen tank threatened their life support and damaged control systems in part of the shuttle. Their transmission to NASA was to the point: "Houston, we've had a problem."

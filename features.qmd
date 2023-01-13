@@ -1,0 +1,18 @@
+---
+title: "II. Text Mining for Simple Features"
+format:
+  html:
+    toc: false
+    toc-location: body
+order: 2
+---
+
+Insert an introductory paragraph here describing this unit.
+
+## Lessons
+
+-   Text in Context: Finding Needles in Haystacks
+-   Counts, Clouds, and Columns: Moving from Words to Numbers
+-   NLP Transformations: Treating Words as Words
+
+## Assignments

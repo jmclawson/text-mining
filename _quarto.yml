@@ -2,6 +2,7 @@ project:
   type: website
   resources: 
     - ".htaccess"
+    - "tutorial-style.css"
 
 website:
   title: "Literary Text Mining"
@@ -21,21 +22,22 @@ website:
     right:
       - text: "Units"
         menu: 
-          - href: foundations/
+          - href: foundations.qmd
             text: "Foundations of Text Mining with R"
-          - href: features/
+          - href: features.qmd
             text: "Mining for Simple Features"
-          - href: sentiment/
+          - href: sentiment.qmd
             text: "Sentiment Analysis"
-          - href: classification/
+          - href: classification.qmd
             text: "Text Classification"
-          - href: topic/
+          - href: topic.qmd
             text: "Topic Modeling"
       - text: "Slides"
         menu: 
           - href: slides/intro-to-text-analysis.qmd
             text: Introduction to Text Analysis
-      - about.qmd
+      - href: about.qmd
+        text: About
 
   # sidebar:
   #   - id: units
@@ -61,17 +63,7 @@ format:
     toc-location: left
     number-sections: true
     df-print: paged
-  
-  revealjs:
-    code-link: true
-    toc: false
-    theme: [moon, slides-custom.scss]
-    highlight-style: dracula
-    number-sections: false
-    echo: true
-    incremental: true
-    slide-number: true
-    chalkboard: true
+    cap-location: margin
 
 editor: visual
 

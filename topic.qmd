@@ -1,0 +1,17 @@
+---
+title: "V. Text Mining for Topic"
+format:
+  html:
+    toc: false
+    toc-location: body
+order: 5
+---
+
+Topic in texts can be measured a couple different ways... etc.
+
+## Lessons
+
+-   Tf-Idf: Distinguishing among Documents
+-   Topic Modeling: Identifying Common Threads across Documents
+
+## Assignments

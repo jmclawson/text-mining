@@ -16,14 +16,17 @@ format:
 -   [First-Person Narratives of the American South](https://docsouth.unc.edu/full-text/first-person-narratives-american-south.zip)
 -   [Library of Southern Literature](https://docsouth.unc.edu/full-text/library-southern-literature.zip)
 -   [North American Slave Narratives](https://docsouth.unc.edu/full-text/na-slave-narratives.zip)
+-   [Song lyrics](https://www.kaggle.com/datasets/notshrirang/spotify-million-song-dataset)
 
 ## Government Sources
 
 -   [Apollo 13 Transcript](data/apollo13.rds)
 -   EPA Incident Reports
+-   [Starr Report](https://www.govinfo.gov/content/pkg/GPO-CDOC-106sdoc3/html/GPO-CDOC-106sdoc3-2.htm)
+-   [Mueller Report](http://opensourcemuellerreport.com/mueller-report.html)
 
 ## Commercial and Other Sources
 
--   Customer Feedback
--   From social media (tweets)
--   Survey responses
+-   Customer Feedback (e.g., [Amazon Review Data](https://nijianmo.github.io/amazon/index.html))
+-   From social media (e.g., from [Social-Searcher](https://www.social-searcher.com))
+-   Survey responses ([paper](https://www.surveypractice.org/article/6384-text-mining-in-survey-data))

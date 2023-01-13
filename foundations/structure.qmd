@@ -1,0 +1,182 @@
+---
+title: "From Page to Table"
+subtitle: "Adding Structure Where It Wasn't"
+categories: 
+  - importing text
+  - writing functions
+order: 2
+df-print: default
+description: "Introducing approaches for reading text files, using Grambling's alma maters as a case study."
+freeze: true
+---
+
+There are certain considerations to keep in mind when working with text in any kind of analysis. Text is often called "unstructured data" because it initially resists techniques that typically apply to studying other kinds of data. With a little effort, we can add structure by reading text data into a table structure. This lesson shows one such process.
+
+## Getting started
+
+As always, it's a good idea to start by loading packages. We'll usually build on packages in the `tidyverse` set of packages, so let's just start there:
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+That's all we'll need in this lesson. Later lessons will use more.
+
+## Reading a text file
+
+Our `data/` folder has a text file for each member institution of the Southwestern Athletic Conference (or SWAC). We'll start by reading Grambling's alma mater and work through preparing it for study. Perhaps the easiest way to read a text file is to use the `readLines()` function to read the file line by line. For this function, the only argument needed is a file name.
+
+```{r}
+readLines("data/almamater_gram.txt")
+```
+
+Notice here that the ninth line is blank. This is an empty line between stanzas, and it'll come in handy in the next section.
+
+## Adding structure
+
+When we talk about structured data, we typically mean data recorded in a table of rows and columns. For Grambling's alma mater, we might imagine a table with one row per line of text, with added columns indicating which school or university, the stanza number, and the line number. Let's start with a table of the first two columns and add stanza and line numbers in subsequent steps:
+
+```{r}
+alma_mater <- data.frame(
+  school = "gram",
+  text = readLines("data/almamater_gram.txt"))
+
+alma_mater
+```
+
+As noted previously, the ninth line here is blank, which is a helpful way to recognize a new stanza. Since there's only two stanzas here, we *could* define things manually:
+
+```{r}
+alma_mater |> 
+  mutate(stanza = c(1, 1, 1, 1, 1, 1, 1, 1, NA, 2, 2, 2, 2, 2, 2, 2, 2))
+```
+
+But doing things manually like this is a mess. It introduces room for mistakes, it isn't easy, and it gets even tougher when we have longer poems. For this purpose, the `cumsum()` function---for "cumulative sum"---can be a good way of adding up all the spaces. Using a logical test inside the parenthesis means it'll add an increment for each time it's true:
+
+```{r}
+alma_mater |> 
+  mutate(
+    stanza = cumsum(text == ""))
+```
+
+This is almost perfect. The only problem is that it should start at *one* instead of *zero*. That's easy to fix by adding 1. While we're at it, we'll exclude the blank line using `filter()`, since it doesn't add any data, we'll add the line number using the `row_number()` function, and we'll move these metadata columns before the text column using `relocate()`:
+
+```{r}
+alma_mater <- 
+  alma_mater |> 
+  mutate(
+    stanza = cumsum(text == "") + 1) |> 
+  filter(text != "") |> 
+  mutate(
+    line = row_number()) |> 
+  relocate(
+    stanza, line,
+    .before = text)
+
+alma_mater
+```
+
+## Making it tidy
+
+Organizing the lyrics by line makes sense in some circumstances, but it's also reasonable to read the lyrics on a word-by-word basis. For this reason, some may even argue that a row-per-word is a "tidier" structure.
+
+The `strsplit()` function allows us to divide the text at every character of our choosing, such as a space. To see how it works, let's try it out with the first line of Grambling's alma mater:
+
+```{r}
+strsplit(
+  "Old Grambling, dear Grambling,", 
+  split = " ")
+```
+
+Here, we defined two arguments inside the parentheses: first is the text we want to split, and second is the character by which to split it. The result is a list of four items, with one item for each word.
+
+Let's see what happens when we apply this function to our data set:
+
+```{r}
+alma_mater |> 
+  mutate(text = strsplit(text, 
+                         split = " "))
+```
+
+Our text column now prints each word in a list separated by commas. This looks very messy, but it's just one step from what we need. The `unnest()` function will let us simplify these lists so that each row contains only a single word:
+
+```{r}
+alma_mater |> 
+  mutate(text = strsplit(text, " ")) |> 
+  unnest(text)
+```
+
+The resulting table has grown from 16 rows (for 16 lines of lyrics) to 100 rows (for 100 words). While we're at it, let's add one more column showing each word's number in its line:
+
+```{r}
+alma_mater |> 
+  mutate(text = strsplit(text, " ")) |> 
+  unnest(text) |> 
+  group_by(school, line) |> 
+  mutate(num = row_number()) |> 
+  ungroup() |> 
+  relocate(num,
+           .before = text)
+```
+
+## Making a function
+
+Putting it all together into a single code chunk, we can see that the whole thing is very reproducible. Only the first couple lines would change if we were going to apply it to the lyrics of a different university's alma mater:
+
+```{r}
+alma_mater <- 
+  data.frame(school = "gram",
+             text = readLines("data/almamater_gram.txt")) |> 
+  mutate(
+    stanza = cumsum(text == "") + 1) |> 
+  filter(text != "") |> 
+  mutate(line = row_number(),
+         text = strsplit(text, " ")) |> 
+  unnest(text) |> 
+  group_by(school, line) |> 
+  mutate(num = row_number()) |> 
+  ungroup() |> 
+  relocate(
+    stanza, line, num,
+    .before = text) 
+
+alma_mater
+```
+
+Now that we've figured out the necessary steps, it is easy to turn it into a function for converting any poem's text file into a tidy data structure. The only argument this function needs is the abbreviation of the school:
+
+```{r}
+tidy_alma <- function(school){
+  file <- paste0("data/almamater_",
+                 school,
+                 ".txt")
+  
+  data.frame(school = school,
+             text = readLines(file)) |> 
+  mutate(
+    stanza = cumsum(text == "") + 1) |> 
+  filter(text != "") |> 
+  mutate(line = row_number(),
+         text = strsplit(text, " ")) |> 
+  unnest(text) |> 
+  group_by(school, line) |> 
+  mutate(num = row_number()) |> 
+  ungroup() |> 
+  relocate(
+    stanza, line, num,
+    .before = text) 
+}
+```
+
+From here, a single function call will get us the tidied alma mater of any school in our folder:
+
+```{r}
+tidy_alma("gram")
+tidy_alma("subr")
+tidy_alma("jsums")
+```
+
+From here, we can do clever things with our structured data.
+
+But that's for another lesson.

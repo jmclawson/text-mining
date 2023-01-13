@@ -5,36 +5,74 @@ format:
     toc: false
     toc-location: body
     number-sections: false
+listing: 
+  - id: appendices
+    contents: "appendix/*.qmd"
+    template: overview.ejs
+    filter-ui: false
+    sort-ui: false
+    table-hover: true
+    sort: order
+    fields: [title, description, reading-time]
+    field-display-names:
+      title: "Lesson"
+      reading-time: "Time"
+  - id: foundations
+    contents: "foundations/*.qmd"
+    template: overview.ejs
+    filter-ui: false
+    sort-ui: false
+    table-hover: true
+    sort: order
+    fields: [title, description, reading-time]
+    field-display-names:
+      title: "Lesson"
+      reading-time: "Time"
+  - id: classification
+    contents: "classification/*.qmd"
+    template: overview.ejs
+    filter-ui: false
+    sort-ui: false
+    table-hover: true
+    sort: order
+    fields: [title, description, reading-time]
+    field-display-names:
+      title: "Lesson"
+      reading-time: "Time"
 ---
 
-## I. [Foundations of Text Mining with R](foundations/)
+## I. [Foundations of Text Mining with R](foundations.qmd)
 
--   Review: Using R and RStudio
--   From Page to Table: Adding Structure Where It Wasn't
+::: {#foundations}
+:::
 
-## II. [Mining for Simple Features](features/)
+## II. [Mining for Simple Features](features.qmd)
 
 -   Text in Context: Finding Needles in Haystacks
 -   Counts, Clouds, and Columns: Moving from Words to Numbers
 -   NLP Transformations: Treating Words as Words
 
-## III. [Sentiment Analysis](sentiment/)
+## III. [Sentiment Analysis](sentiment.qmd)
 
 -   Sentiment at Large: Measuring Document-Level Sentiment
 -   Sentiment over Time: Finding the Plot
 
-## IV. [Text Classification](classification/)
+## IV. [Text Classification](classification.qmd)
 
--   Multidimensional Measures: Kissing the Joy as it Flies
--   Similarity and Difference: Calculating Distance between Texts
--   Clustering and Classifying: Finding K-Nearest Neighbors
--   Visualizing High-Dimensional Data: Using Hierarchical Clusters and Principal Components Analysis
+<!-- -   Multidimensional Measures: Kissing the Joy as it Flies -->
+<!-- -   Similarity and Difference: Calculating Distance between Texts -->
+<!-- -   Clustering and Classifying: Finding K-Nearest Neighbors -->
+<!-- -   Visualizing High-Dimensional Data: Using Hierarchical Clusters and Principal Components Analysis -->
 
-## V. [Topic Modeling](topic/)
+::: {#classification}
+:::
+
+## V. [Topic Modeling](topic.qmd)
 
 -   Tf-idf: Distinguishing among Documents
 -   Topic Modeling: Identifying Common Threads across Documents
 
-## VI. [Appendices](appendix/)
+## VI. [Appendices](appendices.qmd)
 
--   [Houston, We Have a Transcript](appendix/apollo13.qmd)
+::: {#appendices}
+:::

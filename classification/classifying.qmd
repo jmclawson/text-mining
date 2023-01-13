@@ -1,0 +1,140 @@
+---
+title: "Clustering and Classifying"
+subtitle: "Finding K-Nearest Neighbors"
+categories: 
+  - high-dimensionality
+  - classifying
+order: 3
+df-print: default
+description: "Classifying texts based on their similarity to other texts."
+freeze: false
+---
+
+Blah blah blah, here are some things.
+
+## Getting Started
+
+First, load up packages, data, and helper functions:
+
+```{r}
+library(tidyverse)
+source("R/helper.R")
+
+get_if_needed("https://jmclawson.net/text-mining/appendix/data/blake_songs.rds")
+get_if_needed("https://jmclawson.net/text-mining/appendix/data/blake_words.rds")
+get_if_needed("https://jmclawson.net/text-mining/appendix/data/blake_lines.rds")
+get_if_needed("https://jmclawson.net/text-mining/appendix/data/read_blake.rds")
+```
+
+```{r}
+readRDS("data/blake_songs.rds")
+readRDS("data/blake_lines.rds")
+readRDS("data/blake_words.rds")
+readRDS("data/read_blake.rds")
+```
+
+Then create a document-term-matrix:
+
+```{r}
+#| eval: false
+blake_dtm <-
+  blake_words |> 
+  group_by(.poem = poem,
+           .title = title, 
+           word) |> 
+  summarize(count = n()) |> 
+  mutate(totalwords = sum(count),
+         count = count / totalwords) |> 
+  ungroup() |> 
+  group_by(word) |> 
+  mutate(totalcount = sum(count)) |> 
+  arrange(desc(totalcount)) |> 
+  pivot_wider(id_cols = c(.poem,
+                          .title),
+              names_from = word,
+              values_from = count,
+              values_fill = 0) |> 
+  mutate(.rowname = paste0(.poem, 
+                           "_", 
+                           .title)) |> 
+  column_to_rownames(var=".rowname") |> 
+  select(-c(.poem, .title))
+```
+
+The DTM can be flattened by distance to create a dendrogram depicting hierarchical clustering:
+
+```{r}
+#| eval: false
+# suppressPackageStartupMessages(library(dendextend))
+
+feedback_tidy <- feedback |> 
+  unnest_tokens(word, clean) |> 
+  group_by(number, word) |> 
+  summarize(value = n()) |> 
+  mutate(total_words = n(),
+         value = value / total_words) |> 
+  select(-total_words) |> 
+  ungroup() |> 
+  pivot_wider(names_from = word)
+
+blake_distances <- 
+  dist(blake_dtm, 
+       upper = TRUE) |> 
+  as.matrix() |> 
+  data.frame()
+
+blake_dist_long <- 
+  blake_distances |> 
+  rownames_to_column("poem") |> 
+  pivot_longer(
+    -poem,
+    names_to = "to",
+    values_to = "distance") |> 
+  mutate(to = to |> 
+           str_remove_all("^X") |> 
+           str_replace_all("[.]"," ")) |> 
+  filter(distance != 0) |> 
+  arrange(distance)
+
+head(blake_dist_long)
+```
+
+```{r}
+#| eval: false
+my_dend <- blake_dtm |> 
+  dist() |> 
+  hclust() |> 
+  as.dendrogram()
+
+# labels(my_dend) <- feedback$text[labels(my_dend)]
+
+
+my_dend |> 
+  set("branches_lwd", 0.3) |> 
+  set("branches_k_color", k = 10) |> 
+  set("labels_col", k=10) |> 
+  as.ggdend() |> 
+  ggplot(horiz = TRUE)
+```
+
+The DTM can be simplified with principal components analysis to flatten a representation in two dimensions:
+
+```{r}
+#| eval: false
+blake_pca <- 
+  blake_dtm 
+  prcomp()
+
+blake_gg <- 
+  blake_pca$x |> 
+  data.frame() |> 
+  rownames_to_column(".text") |> 
+  separate(.text, 
+           into = c(".poem", ".title"),
+           sep = " - ")
+  
+blake_gg |> 
+  ggplot(aes(PC1, PC2)) +
+  geom_text(aes(label=.poem))
+
+```

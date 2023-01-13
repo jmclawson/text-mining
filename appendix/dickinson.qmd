@@ -1,0 +1,152 @@
+---
+title: "Reading letters to the world"
+categories: 
+  - web scraping
+  - data cleaning
+  - tidytext
+order: 2
+df-print: default
+description: "Preparing a data set of Emily Dickinson's poems."
+freeze: true
+---
+
+Emily Dickinson...
+
+## Downloading
+
+The poems take some work to import. As always, we'll start by loading the necessary packages and scripts.
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+library(rvest)
+library(tidytext)
+source("https://gist.githubusercontent.com/jmclawson/65899e2de6bfee692b08141a98422240/raw/7c5590377332e427691f2331b69abd58be2141ec/get_if_needed.R")
+```
+
+Start with the `get_if_needed()` function to download the webpages just once, saving them locally in the "data" folder:
+
+```{r}
+#| message: false
+get_if_needed("https://www.bartleby.com/113/index1.html", filename = "dickinson1.html")
+
+get_if_needed("https://www.bartleby.com/113/index2.html", filename = "dickinson2.html")
+
+get_if_needed("https://www.bartleby.com/113/index3.html", filename = "dickinson3.html")
+
+get_if_needed("https://www.bartleby.com/113/index4.html", filename = "dickinson4.html")
+
+get_if_needed("https://www.bartleby.com/113/index5.html", filename = "dickinson5.html")
+```
+
+Next, use the `rvest` package to import tables of links:
+
+```{r}
+#| message: false
+get_table <- function(number){
+  filename <- paste0("data/dickinson",
+                     number,
+                     ".html")
+
+  # The second page has a slightly different format
+  if (number == 2){
+    pathway <- "/html/body/table/tr[2]/td[1]/table[2]/tr/td"
+  } else {
+      pathway <- "/html/body/table/tbody/tr[2]/td[1]/table[2]/tbody/tr/td"
+    }
+
+  data.frame(
+    set = number,
+    poem = filename |>
+      read_html() |>
+      html_element(xpath = pathway) |>
+      html_elements("a, ol li a") |>
+      html_text(),
+    href = filename |>
+      read_html() |>
+      html_element(xpath = pathway) |>
+      html_elements("a, ol li a") |>
+      html_attr("href")
+  ) |>
+    mutate(href = "https://www.bartleby.com" |>
+             paste0(href))
+}
+
+dickinson_collect <-
+  rbind(get_table(1),
+        get_table(2),
+        get_table(3),
+        get_table(4),
+        get_table(5))
+```
+
+Download each poem and extract its text:
+
+```{r}
+#| message: false
+get_poem <- function(href){
+  get_if_needed(href,
+                destdir = "data/dickinson")
+
+  the_filename <-
+    "data/dickinson/" |>
+    paste0(
+      href |>
+        str_extract("[a-z A-Z 0-9 \\- _]+[.]{1,1}+[a-zA-Z]{1,4}$"))
+
+  the_filename |>
+    read_html() |>
+    html_element("body > table > tbody > tr:nth-child(2) > td:nth-child(1) > table:nth-child(3) > tbody") |>
+    html_elements("tr") |>
+    html_text() |>
+    tibble() |>
+    setNames("text") |>
+    mutate(url = href) |>
+    rename(href = url)
+}
+
+dickinson_poems <-
+  dickinson_collect[,"href"] |>
+  lapply(get_poem) |>
+  bind_rows()
+```
+
+Tidy the poems up by indicating stanza, indicating line number, and cleaning the text as feasible:
+
+```{r}
+dickinson_poems <-
+  dickinson_poems |>
+  group_by(href) |>
+  mutate(
+    stanza =
+      cumsum(
+        !str_detect(text,
+                    "[A-Za-z]")) + 1) |>
+  filter(str_detect(text,"[A-Za-z]")) |>
+  group_by(href) |>
+  mutate(
+    line = row_number(),
+    text = text |>
+      str_remove_all(
+        "[[:space:]]+[[:digit:]]+$") |>
+      str_remove_all(
+        "^[[:space:]]+"))
+```
+
+Combine the two data sets in one and clean first lines, if possible:
+
+```{r}
+dickinson_all <-
+  left_join(dickinson_collect,
+            dickinson_poems,
+            by = "href")
+```
+
+Finally, convert the data frame to a tidy structure, with one token per row:
+
+```{r}
+dickinson_tt <-
+  dickinson_all |>
+  unnest_tokens(word, text)
+```

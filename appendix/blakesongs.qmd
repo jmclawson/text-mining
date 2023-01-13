@@ -1,0 +1,233 @@
+---
+title: "Songs of Innocence and Experience"
+categories: 
+  - web scraping
+  - tidytext
+order: 3
+df-print: paged
+description: "Preparing a set of poems for text mining."
+freeze: false
+---
+
+William Blake was a poet and artist in England whose works in the late-18th and early-19th centuries helped to define what became known as the Romantic Age. Something of a polymath, he produced art in many different forms throughout his life. We study him in a literature class primarily for his poetry. 
+
+First published 1789, his book *Songs of Innocence and Experience* is a two-part collection that pulls together, as the title suggests, two different kinds of poems. The first half contains allegedly "innocent" poems, or poems showing a seemingly idealized, childlike, or untouched outlook on the world. The second half is devoted to allegedly "experienced" poems, or poems showing the corrupting and degrading influence of the world over time. In many cases, these halves resist their boundaries.
+
+Because the 47 poems are relatively short, and they offer this two-part categorization, the collection is a good candidate for text mining. But be careful: this impressive collection is deceptive in its simplicity. Although the poems are easy to read and can seem easy to understand, deeper readings may actually undermine what their surfaces suggest.
+
+## Downloading the collection as a webpage
+
+The poems take some work to import. As always, we'll start by loading the necessary packages and scripts.
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+library(rvest)
+library(tidytext)
+source("R/helper.R")
+```
+
+Project Gutenberg hosts a handy copy of the collection. Start with the `get_if_needed()` function to download the webpage just once, saving it locally in the "data" folder:
+
+```{r}
+#| message: false
+get_if_needed("https://www.gutenberg.org/cache/epub/1934/pg1934-images.html", filename = "blakesongs.html")
+```
+
+## Reading the webpage
+
+We'll use functions from `rvest` to read the HTML. Before doing that, it's important to understand the structure of the webpage we're scraping. In your web browser, the "View Source" or "Web Inspector" option allows you to see the HTML underlying things. From there you can drill down to find a poem and see its code. Here's what that looks like in Safari:
+
+[![Web inspector showing HTML beside the rendered output.](web_inspector.png){style="border: 1px solid black;" fig-alt="Screen shot of web inspector in Safari" fig-align="center"}](https://www.gutenberg.org/cache/epub/1934/pg1934-images.html#song34)
+
+For clarity's sake, here's that HTML as written:
+
+``` html
+<div class="chapter">
+<h2><a id="song34"></a>MY PRETTY ROSE TREE</h2>
+<p class="poem">
+A flower was offered to me,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Such a flower as May never bore;<br>
+But I said, ‘I’ve a pretty rose tree,’<br>
+&nbsp;&nbsp;&nbsp;&nbsp;And I passed the sweet flower o’er.
+</p>
+<p class="poem">
+Then I went to my pretty rose tree,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;To tend her by day and by night;<br>
+But my rose turned away with jealousy,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;And her thorns were my only delight.
+</p>
+</div>
+```
+
+As this example shows, each poem is enclosed by a `<div>` tag with the `class="chapter"`, each title is marked by `<h2>` tags, each stanza is indicated by `<p>` tags, and lines are delineated by `<br>` tags. It's tempting to extract the poem number via the `id` attribute in the `<a>` tags; unfortunately, each section header is also counted as a poem, so the number is inaccurate. Finally, indentations are shown via non-breaking spaces, or `&nbsp;` code elements, which we can just ignore.
+
+Given this pattern, we can scrape a collection of the poems by finding all the "chapter" class elements. Then, for each poem, we can write a function to find its title and stanzas. Finally, we can process the whole collection of poems.
+
+```{r}
+# Create a function to parse each poem.
+get_poem <- function(x){
+  
+  # Extract the H2 (header) as a title.
+  poem_title <- 
+    x |> 
+    html_elements("h2") |>
+    html_text()
+  
+  # Get texts from each P (paragraph) 
+  # as a stanza. Collapse the stanzas
+  # as single elements with line breaks
+  # between them.
+  poem_text <- 
+    x |> 
+    html_elements("p") |>
+    html_text() |> 
+    paste(collapse = "\n\n")
+  
+  # Combine title and stanzas into a table.
+  the_poem <- 
+    data.frame(
+      title = poem_title,
+      text = poem_text)
+  
+  return(the_poem)
+}
+
+blake_songs <- 
+  # Read the page
+  read_html("data/blakesongs.html") |> 
+  # Find the "chapters"
+  html_elements(".chapter") |> 
+  # Apply the function to each of them
+  lapply(get_poem) |> 
+  # Combine them
+  bind_rows() |>
+  # Make the table nicer
+  mutate(
+    # clean weirdnesses in the poem texts
+    text = 
+      text |> 
+      str_remove_all("^\r\n") |> 
+      str_replace_all("\r\n", "\n") |> 
+      str_replace_all("[\n]{2,}", "\n\n"),
+    # add marker for section
+    section = 
+      cumsum(title %in% c("SONGS OF INNOCENCE","SONGS OF EXPERIENCE"))) |> 
+  # Drop empty "poems"
+  filter(text != "") |> 
+  # Number the poems
+  mutate(poem = row_number()) |> 
+  # Reorder the columns
+  relocate(section, poem)
+
+blake_songs
+```
+
+## Reading the poems
+
+From here, we can read any one of the poems in the set. Because it's something we might imagine doing multiple times, let's start by defining a function:
+
+```{r}
+read_blake <- function(
+    poem = NULL,
+    x = blake_songs){
+  the_poem <- poem
+  if (is.null(the_poem)) {
+    the_poem <- x |> 
+      pull(poem) |> 
+      sample(1)
+  }
+  
+  if (is.numeric(the_poem)) {
+    the_title <- x |> 
+      filter(poem == the_poem) |> 
+      pull(title)
+    x <- filter(x, poem == the_poem)
+  } else {
+    the_title <- toupper(the_poem)
+    x <- filter(x, title == the_poem)
+  }
+  
+  to_print <- pull(x, text)
+  
+  paste0(the_title,"\n\n",
+        to_print,
+        collapse="") |> 
+    cat()
+}
+```
+
+The function is designed to work three different ways. The recommended way is to provide a poem's number:
+
+```{r}
+read_blake(4)
+```
+
+If instead of a number a title is given in quotation marks, it'll print that. Since some poems repeat the same title or use very similar titles, be careful here; the number is really the recommended use case.
+
+```{r}
+read_blake("LONDON")
+```
+
+Finally, if the parentheses are empty, a poem will be chosen at random:
+
+```{r}
+read_blake()
+```
+
+## Tidying the collection
+
+To read poems computationally, we'll want them tidied up a little more. Let's remove indentations and add columns for stanza and line.
+
+```{r}
+blake_lines <-
+  blake_songs |> 
+  group_by(poem) |> 
+  mutate(
+    text = strsplit(text, "\n\n")) |>
+  unnest(text) |> 
+  mutate(
+    stanza = row_number(),
+    text = strsplit(text, "\n")) |> 
+  unnest(text) |> 
+  mutate(
+    line = row_number(),
+    text = text |> 
+      str_remove_all("^[[:space:]]+")) |> 
+  ungroup() |> 
+  relocate(
+    section, poem, title, stanza, line)
+
+blake_lines
+```
+
+From here we can convert the table to a tidytext format with one word per line.
+
+```{r}
+blake_words <- 
+  blake_lines |> 
+  unnest_tokens(word, text)
+
+blake_words
+```
+
+That last step makes for a very long table!
+
+## Exporting Data and Functions
+
+Now we have a literary data set for text mining. Saving the artifacts in their final forms means they can be downloaded directly:
+
+```{r}
+saveRDS(blake_songs, "data/blake_songs.rds")
+saveRDS(blake_lines, "data/blake_lines.rds")
+saveRDS(blake_words, "data/blake_words.rds")
+saveRDS(read_blake, "data/read_blake.rds")
+```
+
+Here are links for direct download:
+
+-   [blake_songs](data/blake_songs.rds)
+-   [blake_lines](data/blake_lines.rds)
+-   [blake_words](data/blake_words.rds)
+-   [read_blake](data/read_blake.rds)

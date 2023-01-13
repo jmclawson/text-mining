@@ -1,0 +1,17 @@
+---
+title: "III. Text Mining for Sentiment"
+format:
+  html:
+    toc: false
+    toc-location: body
+order: 3
+---
+
+This unit will blah, blah, blah, blah, blah. Don't get too sentimental about it.
+
+## Lessons
+
+-   Sentiment at Large: Measuring Document-Level Sentiment
+-   Sentiment over Time: Finding the Plot
+
+## Assignments

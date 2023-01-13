@@ -1,0 +1,34 @@
+```{=html}
+<ul class="overview-ejs">
+<% for (const item of items) { %>
+  <li><a href="<%- item.path %>"><%= item.title %><% if (item.subtitle) { %>: <%= item.subtitle %><% } %></a>—<%- item['reading-time'] %>
+  <p><%- item.description %></p>
+  <% if (item.categories) { %>
+  <div class="listing-categories">
+  <% for (const category of item.categories) { %>
+<div class="listing-category" onclick="window.quartoListingCategory('<%=category%>'); return false;"><%= category %></div>
+  <% } %>
+  </div>
+  <% } %>
+  <% if (item.tutorials) { %>
+  <div class="listing-tutorials">
+  Tutorials:
+    <ul>
+    <% for (const tutorial of item.tutorials) { %>
+      <li class="listing-tutorial"><a href="<%= tutorial.href %>", target="_blank"><%= tutorial.title %></a></li>
+    <% } %>
+    </ul>
+  </div>
+  <% } %>
+  <% if (item.slides) { %>
+  Slides:
+    <ul class="listing-slides">
+    <% for (const deck of item.slides) { %>
+      <li class="listing-deck"><a href="<%= deck.href %>"><%= deck.title %></a></li>
+    <% } %>
+    </ul>
+  <% } %>
+  </li>
+<% } %>
+</ul>
+```

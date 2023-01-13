@@ -1,0 +1,21 @@
+---
+title: "Appendices"
+listing: 
+  id: appendices
+  contents: "appendix/*.qmd"
+  type: grid
+  fields: [title, categories, reading-time, description]
+  sort: order
+format:
+  html:
+    toc: false
+    toc-location: body
+    number-sections: false
+---
+
+These resources are outside the scope of our class, but they document some of the steps that went into making data available. They're published here to share the thought process and to share methods with anyone curious to learn more.
+
+## Contents
+
+::: {#appendices}
+:::

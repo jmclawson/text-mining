@@ -1,0 +1,36 @@
+/*-- scss:defaults --*/
+$theme-darkblue: #01364C;
+$theme-blue: #99D9DD;
+$theme-white: #F7F8F9;
+$theme-yellow: #F4BA02;
+$brightpink: #FB11B1;
+$blackpink: #430030;
+$darkblackpink: #220020;
+$darkerblackpink: #210010;
+$primary: $blackpink;
+$secondary: #FF6600;
+$notwhite: #FFDCF5; 
+$white: #FFFAFE;
+$black: $blackpink;
+
+$link-color: $brightpink;
+$body-bg: $black;
+$code-block-bg: mix($black, #ffffff, 15%);
+$code-bg: $code-block-bg;
+$body-color: $white;
+
+$presentation-heading-color: $notwhite;
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+
+$font-family-sans-serif: 'Manrope', sans-serif;
+$presentation-heading-font: 'IBM Plex Serif', serif;
+$presentation-heading-text-transform: none;
+/*-- scss:rules --*/
+
+.reveal pre > code:not(:first-child).fragment {
+  width: 99% !important;
+  left: 4px !important;
+  padding-left: 5px !important;
+}

@@ -7,7 +7,7 @@ format:
     number-sections: false
 ---
 
-## Acknowledgements
+This site was created as an open education resource for a course in literary text mining. It's built with [Quarto](https://quarto.org), an open-source publishing system that works with R, Python, and other coding languages using Pandoc. All the code can be found in the site's [GitHub repository](https://github.com/jmclawson/text-mining).
 
 ## Attributions
 
@@ -17,4 +17,6 @@ Original [transcripts](https://www.hq.nasa.gov/alsj/a13/AS13_TEC.txt) from the A
 
 Text sets sourced from University of North Carolina's [*Documenting the American South*](https://docsouth.unc.edu/docsouthdata/) project include The Church in the Southern Black Community, First-Person Narratives of the American South, Library of Southern Literature, and North American Slave Narratives.
 
-Photo by <a href="https://unsplash.com/@lemonvlad?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Vladislav Klapin</a> on <a href="https://unsplash.com/s/photos/introduction?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+Title photo for "Introduction to Text Analysis" slides by [Vladislav Klapin](https://unsplash.com/@lemonvlad?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) on [Unsplash](https://unsplash.com/s/photos/introduction?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText).
+
+## Acknowledgements

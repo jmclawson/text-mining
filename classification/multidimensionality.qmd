@@ -1,0 +1,318 @@
+---
+title: "Multidimensional Measures"
+subtitle: "Kissing the Joy as it Flies"
+categories: 
+  - high-dimensionality
+  - concept
+order: 1
+df-print: paged
+fig-cap-location: margin
+tbl-cap-location: margin
+description: "Explaining the usefulness of data sets with many dimensions."
+freeze: false
+---
+
+We're used to thinking of things in three dimensions: width, depth, and height. When it comes to location, we think of forward/backward, left/right, and up/down. Likewise, three numbers are enough to approach the outstretched claws on Grambling's tiger statue Eddie by describing their latitude north of the equator (32.5251), their longitude west of the prime meridian (-92.7143), and their height above sea level (about 325 feet).
+
+![Eddie's claws can be found with just three dimensions.](eddie.jpg){fig-alt="Photo of tiger statue Eddie on Grambling's campus" fig-align="center"}
+
+When we move outside of physical space, it may seem daunting to think of higher numbers of dimensions. But when we talk about multidimensionality, we aren't necessarily talking about science fiction and *Doctor Strange*; after all, a *dimension* is just some aspect of a thing. For instance, a specific shoe might be identified by its manufacturer, model, year, colorway, size, and foot.
+
+![This shoe, or one like it, can be described with at least six dimensions.](shoe.jpg){fig-alt="Photo of shoe" fig-align="center"}
+
+This particular shoe was manufactured by Nike (1st dimension) in their Air Force 1 Low '07 line (2nd). It was released in the year 2021 (3rd), and it features the Tulip Pink / University Red-White colorway (4th). Finally, it's in men's size 12 (5th), and it's shaped to fit on the right foot (6th).
+
+In a similar vein, we can think of sufficient dimensions to describe a text. An infinite number of dimensions could recreate every text exactly, indicating which word is first, which is second, and which third, but such a collection would quickly grow to an unreasonable size. With a smaller number, we can get *close enough* to identify the important characteristics of documents in a collection based on which words they contain.
+
+## Introducing the document-term matrix
+
+One common approach to getting *close enough* when choosing dimensions to represent texts is by measuring the frequencies of words within them. A **document-term matrix** is a table representing documents this way, with each row representing a document, each column representing a word, and the cell values representing the frequencies of each word within each document.
+
+That's kind of abstract, so let's look at part of a document-term matrix of the alma maters of Grambling State, Jackson State, and Southern University:
+
+```{r}
+#| echo: false
+#| message: false
+#| tbl-cap: "This matrix actually has 106 columns, so only the first few columns are shown here."
+#| tbl-cap-location: margin
+library(tidyverse)
+library(tidytext)
+
+# alma_three <- rbind(
+#     tidy_alma("gram"),
+#     tidy_alma("subr"),
+#     tidy_alma("jsums"))
+
+# saveRDS(alma_three, "data/alma_three.rds")
+
+alma_three <-
+  readRDS("data/alma_three.rds") |> 
+  mutate(text = tolower(text) |> 
+           str_replace_all("old", "ole")) |> 
+  unnest_tokens(word, text) |> 
+  group_by(university = school, 
+           word) |> 
+  summarize(count = n()) |> 
+  ungroup() |> 
+  pivot_wider(names_from = word,
+              values_from = count,
+              values_fill = 0) |> 
+  relocate(ole, grambling, dear, we, 
+           love, thee, dear, loyal, 
+           to, our, school, fight,
+           `for`, evermore,
+           .after = university) |> 
+  mutate(university = c("Grambling", 
+                        "Jackson",
+                        "Southern")) |> 
+  column_to_rownames("university")
+
+alma_three[,1:9]
+```
+
+Here we see that the term "ole" appears nine times in Grambling's alma mater, once in Jackson's, and never in Southern's. Unsurprisingly, Grambling's alma mater is the only one that mentions "Grambling," and it does so twelve times. Meanwhile, all three songs use the word "dear," with Grambling's repeating it nine times, Jackson's repeating it five times, and Southern's repeating it three times.
+
+Because the document-term matrix is just a representation of the original texts, it doesn't give us every detail. For instance, it lacks punctuation, it lacks capitalization, and it doesn't identify a word's place in the text. It's possible that two rows might end up with the same values in every column if they have the same words in a different order, but for two documents to match on so many dimensions would mean that they must have a lot in common anyway.
+
+## Doing it ourselves
+
+Instead of counting each use of a word to form these document-term matrices, we'll ask the computer to do it for us.
+
+### Getting Started
+
+Before doing anything, we'll always load up the necessary packages, data, and any helper functions. As always, we'll start by loading the `tidyverse`:
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+```
+
+### Preparing data
+
+Next, it's a good idea to load the text data and take a look at its structure to understand what we're working with. We'll be starting from William Blake's book of poetry, *Songs of Innocence and Experience*, a set of poems divided into two halves. These have already been prepared in a "tidy" format with one word per row ([link explaining that process](../appendix/blakesongs.qmd)), so the next steps are straightforward.
+
+```{r}
+blake_words <- readRDS("../appendix/data/blake_words.rds")
+
+blake_words
+```
+
+Of these six columns, we'll be primarily interested in the "title" and "word" columns. But since I know that two poems in the collection have the same title, I'm going to combine the "title" column with the "poem" column, which indicates the poem's placement out of 47 poems in the book. The `unite()` function makes it easy to combine two columns like this.
+
+```{r}
+blake_words <- 
+  "../appendix/data/blake_words.rds" |> 
+  readRDS() |> 
+  mutate(
+    poem = formatC(poem, 
+                   width=2, 
+                   flag="0")) |> 
+  unite(document_name, 
+        poem, 
+        title) |> 
+  select(document_name, term = word)
+
+blake_words
+```
+
+With our data in a clean, tidy format, it's easy to create a document-term matrix.
+
+## Measuring one poem
+
+To simplify things as we build a document-term matrix, we'll filter to work through one poem before doing the whole set. Let's first read the poem to visualize how the final matrix may look:
+
+```{r}
+#| echo: false
+blake_songs <- readRDS("../appendix/data/blake_songs.rds")
+
+read_blake <- readRDS("../appendix/data/read_blake.rds")
+
+read_blake("THE LILY")
+```
+
+Because the poem is short, few words repeat. With four repetitions, it looks like "a" may be the word with the highest frequency, followed by "the" with a frequency of three. Beyond that, I'm not really willing to count them manually.
+
+### Counting words
+
+Doing it with code is actually easier than counting by hand. We'll start by using `filter()` to choose just one poem, group by each word, and summarize to count how many times each word appears; the `n()` function does the counting for us. Finally, though it isn't necessary, we'll arrange the table to show the frequency in a descending order.
+
+```{r}
+#| message: false
+blake_words |> 
+  filter(document_name == "34_THE LILY") |> 
+  group_by(document_name, term) |> 
+  summarize(frequency = n()) |> 
+  arrange(desc(frequency))
+```
+
+This table shows us that the poem has 24 unique terms. That's a small number of repetitions, given the poem's size, and we'll have a chance to study that later. Although it might seem unnecessary to have the first column repeating so much here, we need it so that the title isn't lost when we add other poems.
+
+### Entering the matrix
+
+From here, `pivot_wider()` will convert the table of frequencies into a document-term matrix with just one row:
+
+```{r}
+#| message: false
+blake_words |> 
+  filter(document_name == "34_THE LILY") |> 
+  group_by(document_name, term) |> 
+  summarize(frequency = n()) |> 
+  arrange(desc(frequency)) |> 
+  pivot_wider(names_from = term,
+              values_from = frequency)
+```
+
+This document-term matrix makes sense, given the poem we're working with.
+
+## Measuring the collection
+
+Now, let's try it on the whole set. Removing the `filter()` step should apply the process to all of the poems:
+
+```{r}
+#| message: false
+blake_words |> 
+  group_by(document_name, term) |> 
+  summarize(frequency = n()) |> 
+  arrange(desc(frequency)) |> 
+  pivot_wider(names_from = term,
+              values_from = frequency)
+```
+
+Working with the set of 47 poems, we see that some values are missing, replaced with `NA` values. These values show that the poem doesn't have any instances of a particular word. We can fill these in with zeroes by adding `values_fill = 0` to the `pivot_wider()` function:
+
+```{r}
+#| message: false
+blake_words |> 
+  group_by(document_name, term) |> 
+  summarize(frequency = n()) |> 
+  arrange(desc(frequency)) |> 
+  pivot_wider(names_from = term,
+              values_from = frequency,
+              values_fill = 0)
+```
+
+Now our document-term matrix is ready to use!
+
+## Controlling for size
+
+Poems in this collection vary in size. Some are quite short, and others are pretty long. To get a better sense of each word's weight in a poem, it might actually be better for our matrix to indicate the percentage for each term, rather than the number of times it's used. We can do that by dividing the word frequencies by the number of words in each poem.
+
+Let's start by figuring out the length of each poem:
+
+```{r}
+blake_words |> 
+  group_by(document_name) |> 
+  summarize(word_count = n())
+```
+
+With 252 words, the longest poem, "Night," is more than 8 times the size of the shortest poem, "The Lily," which has only 31 words. Converting values to percentages is almost necessary when comparing documents of such disparate size.
+
+methods...
+
+```{r}
+#| message: false
+blake_dtm <- 
+  # Start from stable data
+  blake_words |> 
+  # group by poem and word
+  group_by(document_name, term) |> 
+  # count frequency for each word in a poem
+  summarize(
+    frequency = n()) |> 
+  # be certain about grouping by poem
+  ungroup() |> 
+  group_by(document_name) |> 
+  # count the number of words in each poem
+  mutate(
+    word_count = n()) |> 
+  ungroup() |> 
+  # divide frequency by word count to convert to percentage
+  mutate(
+    frequency = frequency / word_count) |> 
+  # drop the unnecessary column
+  select(-word_count) |> 
+  # arrange words by frequency
+  arrange(desc(frequency)) |> 
+  # convert to matrix and fill missing values
+  pivot_wider(
+    names_from = term,
+    values_from = frequency,
+    values_fill = 0)
+
+blake_dtm
+```
+
+### Final polishing
+
+As one final step of polish, columns can be arranged by their average values instead of their maxima:
+
+```{r}
+blake_dtm |> 
+  # convert from wide matrix to long format
+  pivot_longer(
+    -document_name,
+    names_to = "term",
+    values_to = "frequency") |> 
+  # group by words
+  group_by(term) |> 
+  # add a column measuring the average value
+  mutate(mean_frequency = mean(frequency)) |> 
+  ungroup() |>
+  # arrange words by this average value
+  arrange(
+    document_name,
+    desc(mean_frequency)) |>
+  # drop this column of average value
+  select(-mean_frequency) |>
+  # convert back to a matrix
+  pivot_wider(
+    names_from = "term",
+    values_from = "frequency")
+```
+
+```{r}
+#| eval: false
+blake_dtm <-
+  blake_words |> 
+  # Group by poem and word
+  group_by(.poem = document_name,
+           term) |> 
+  # Count each word's frequency in each poem
+  summarize(count = n()) |> 
+  # Convert values to percentages
+  mutate(total_word_doc = sum(count),
+         count = count / total_word_doc) |> 
+  # Measure total usage of each word
+  # in the entire corpus of documents
+  ungroup() |> 
+  group_by(term) |> 
+  mutate(total_word_all = sum(count)) |> 
+  # Arrange words in descending order
+  arrange(desc(total_word_all)) |> 
+  # Reshape data to wide format
+  pivot_wider(id_cols = .poem,
+              names_from = term,
+              values_from = count,
+              values_fill = 0) |> 
+  # Combine poem title to rowname
+  column_to_rownames(".poem")
+
+blake_dtm
+```
+
+## Conclusions
+
+William Blake's short poem "Eternity" describes the occasional necessity of being satisfied with *close enough*:
+
+> Eternity
+>
+> He who binds to himself a joy\
+> Does the winged life destroy,\
+> But he who kisses the joy as it flies\
+> Lives in eternity's sunrise.\
+> --- William Blake
+
+"Binding" ourselves directly to the thing we're studying kills it; stopping short of that gives us the chance to enjoy it in motion. In the same way, we'll need to deal with texts indirectly, looking instead at a simplified representation. Rather than an infinite set of dimensions describing each text exactly, some finite set of features will have to suffice.
+
+Pushing off into a sea of uncertainty can be unsettling, but approaching a text via its abstraction, kissing it as it flies, gives us a chance to see it in new contexts and from different angles.

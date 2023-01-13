@@ -1,0 +1,26 @@
+---
+title: "I. Foundations of Text Mining with R"
+format:
+  html:
+    toc: false
+    toc-location: body
+order: 0
+listing: 
+  id: foundations
+  contents: "foundations/*.qmd"
+  type: grid
+  fields: [title, categories, reading-time, description]
+  sort: order
+---
+
+This first unit offers a review of using R and RStudio for different purposes, including a general reminder of conventions and common functions. After that, it shows a couple common techniques for converting unstructured text data into structured tables of measurements, and it explains the differences and uses among two typical shapes of text data.
+
+## Lessons
+
+-   Review: Using R and RStudio
+-   [From Page to Table: Adding Structure Where It Wasn't](structure.qmd)
+
+::: {#foundations}
+:::
+
+## Assignments

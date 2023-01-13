@@ -1,0 +1,27 @@
+---
+title: "IV. Text Mining for Classification"
+format:
+  html:
+    toc: false
+    toc-location: body
+order: 4
+listing: 
+  id: lessons
+  type: grid
+  fields: [title, categories, reading-time, description]
+  sort: order
+---
+
+When texts are classified, it can be easier to decide what kind of actions should be taken on them next. Classifying is helpful when working with a large set of texts or when splitting a single large text into multiple parts.
+
+## Lessons
+
+-   Multidimensional Measures: Kissing the Joy as it Flies
+-   Similarity and Difference: Calculating Distance between Texts
+-   Clustering and Classifying: Finding K-Nearest Neighbors
+-   Visualizing High-Dimensional Data: Using Hierarchical Clusters and Principal Components Analysis
+
+::: {#lessons}
+:::
+
+## Assignments
