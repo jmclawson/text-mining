@@ -13,25 +13,25 @@ website:
   navbar:
     logo: noun-hard-hat-smaller.png
     left:
-      - href: syllabus.qmd
-        text: "Syllabus"
+      # - href: syllabus.qmd
+      #   text: "Syllabus"
       - href: overview.qmd
         text: "Overview"
       - href: texts.qmd
         text: "Texts"
     right:
-      - text: "Units"
-        menu: 
-          - href: foundations.qmd
-            text: "Foundations of Text Mining with R"
-          - href: features.qmd
-            text: "Mining for Simple Features"
-          - href: sentiment.qmd
-            text: "Sentiment Analysis"
-          - href: classification.qmd
-            text: "Text Classification"
-          - href: topic.qmd
-            text: "Topic Modeling"
+      # - text: "Units"
+      #   menu: 
+      #     - href: foundations.qmd
+      #       text: "Foundations of Text Mining with R"
+      #     - href: features.qmd
+      #       text: "Mining for Simple Features"
+      #     - href: sentiment.qmd
+      #       text: "Sentiment Analysis"
+      #     - href: classification.qmd
+      #       text: "Text Classification"
+      #     - href: topic.qmd
+      #       text: "Topic Modeling"
       - text: "Slides"
         menu: 
           - href: slides/intro-to-text-analysis.qmd

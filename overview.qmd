@@ -59,10 +59,10 @@ listing:
 
 ## IV. [Text Classification](classification.qmd)
 
-<!-- -   Multidimensional Measures: Kissing the Joy as it Flies -->
-<!-- -   Similarity and Difference: Calculating Distance between Texts -->
-<!-- -   Clustering and Classifying: Finding K-Nearest Neighbors -->
-<!-- -   Visualizing High-Dimensional Data: Using Hierarchical Clusters and Principal Components Analysis -->
+-   Multidimensional Measures: Kissing the Joy as it Flies
+-   Similarity and Difference: Calculating Distance between Texts
+-   Clustering and Classifying: Finding K-Nearest Neighbors
+-   Visualizing High-Dimensional Data: Using Hierarchical Clusters and Principal Components Analysis
 
 ::: {#classification}
 :::

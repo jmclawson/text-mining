@@ -1,7 +1,7 @@
 ```{=html}
 <ul class="overview-ejs">
 <% for (const item of items) { %>
-  <li><a href="<%- item.path %>"><%= item.title %><% if (item.subtitle) { %>: <%= item.subtitle %><% } %></a>—<%- item['reading-time'] %>
+  <li><a href="<%- item.path %>"><%= item.title %><% if (item.subtitle) { %>: <%= item.subtitle %><% } %></a><!-- —<%- item['reading-time'] %> -->
   <p><%- item.description %></p>
   <% if (item.categories) { %>
   <div class="listing-categories">

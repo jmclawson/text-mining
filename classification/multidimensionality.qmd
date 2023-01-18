@@ -10,6 +10,7 @@ fig-cap-location: margin
 tbl-cap-location: margin
 description: "Explaining the usefulness of data sets with many dimensions."
 freeze: false
+draft: true
 ---
 
 We're used to thinking of things in three dimensions: width, depth, and height. When it comes to location, we think of forward/backward, left/right, and up/down. Likewise, three numbers are enough to approach the outstretched claws on Grambling's tiger statue Eddie by describing their latitude north of the equator (32.5251), their longitude west of the prime meridian (-92.7143), and their height above sea level (about 325 feet).

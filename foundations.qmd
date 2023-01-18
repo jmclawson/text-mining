@@ -17,8 +17,8 @@ This first unit offers a review of using R and RStudio for different purposes, i
 
 ## Lessons
 
--   Review: Using R and RStudio
--   [From Page to Table: Adding Structure Where It Wasn't](structure.qmd)
+<!-- -   Review: Using R and RStudio -->
+<!-- -   [From Page to Table: Adding Structure Where It Wasn't](structure.qmd) -->
 
 ::: {#foundations}
 :::

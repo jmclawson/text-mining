@@ -8,6 +8,7 @@ order: 3
 df-print: default
 description: "Classifying texts based on their similarity to other texts."
 freeze: false
+draft: true
 ---
 
 Blah blah blah, here are some things.

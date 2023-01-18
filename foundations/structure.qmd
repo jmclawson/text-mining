@@ -4,9 +4,10 @@ subtitle: "Adding Structure Where It Wasn't"
 categories: 
   - importing text
   - writing functions
-order: 2
+order: 3
 df-print: default
 description: "Introducing approaches for reading text files, using Grambling's alma maters as a case study."
+draft: true
 freeze: true
 ---
 

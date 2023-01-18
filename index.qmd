@@ -13,7 +13,8 @@ In this project-based course, students will use tools and methods of data analys
 
 ## Links
 
--   [Syllabus](syllabus.qmd)
+<!-- -   [Syllabus](syllabus.qmd) -->
+
 -   [Overview](overview.qmd)
 -   [Texts](texts.qmd)
 -   [About](about.qmd)
