@@ -1,0 +1,391 @@
+---
+title: "Overview"
+subtitle: "Tables in R"
+order: 2
+description: "Reviewing key parts of working with structured data using tables in R."
+categories: 
+  - introduction
+  - tables
+tutorials: 
+  - href: "http://jmclawson.shinyapps.io/ltm-03-tables-1/"
+    title: "03 - Tables, part 1"
+  - href: "http://jmclawson.shinyapps.io/ltm-04-tables-2/"
+    title: "04 - Tables, part 2"
+freeze: true
+---
+
+Where R really shines is in the ways it helps us work with structured data, or data that is organized in tables with rows and columns. Before reading through this page, it might be a good idea to work through it in two interactive tutorials, which will offer a good way to practice what we cover here:
+
+-  [03 - Tables, part 1](http://jmclawson.shinyapps.io/ltm-03-tables-1/)
+-  [04 - Tables, part 2](http://jmclawson.shinyapps.io/ltm-04-tables-2/)
+
+The web page reinforces these tutorials with a static overview you can return to over time.
+
+Typically, when we talk about tables in R, we're talking about objects called "data frames" or "tibbles." (They're very similar.) It's easy to make a data frame by using the `data.frame()` function like this, with each column defined by a vector:
+
+```{r dataframes1}
+#| label: 
+my_pets <- data.frame(
+  name = c("Scotty", "Priscilla", "Nefertiti", "O'Gilt", "Pollyana", "Hawn"),
+  type = c("dog", "dog", "cat", "fish", "bird", "fish"),
+  subtype = c("schanuzer", "poodle", "sphynx", "goldfish", "parrot", "goldfish"),
+  age = c(12, 11, 7, 1, 25, 2),
+  aquatic = c(FALSE, FALSE, FALSE, TRUE, FALSE, TRUE))
+
+my_pets
+```
+
+When data is structured like this, we'll talk about columns, which go up and down, and rows, which run side to side. To remember the difference, think of the columns you might see in classical architecture.
+
+[![By Steve Swayne - File:O Partenon de Atenas.jpg, originally posted to Flickr as The Parthenon Athens, CC BY 2.0](http://jmclawson.net/The_Parthenon_in_Athens.jpg)](https://commons.wikimedia.org/w/index.php?curid=17065839)
+
+
+Most commonly, the rows indicate observations or instances (in this case, each row is one pet), and columns indicate variables or features of that observation. Every cell has just one value in it.
+
+Although it's easy to make a data frame on our own, it's much more common to find one that has already been made and to import it into R. For this lesson, we'll be using a data set of book titles from Wikipedia:
+
+```{r}
+#| label: dataframes2
+#| message: false
+#| echo: false
+#| warning: false
+#| df-print: paged
+
+library(rmarkdown)
+library(tidyverse)
+wiki_lit <- 
+  readRDS("data/corpus_wikipedia.rds") |> 
+  rename(title = titles)
+```
+
+```{r}
+#| label: dataframes2a
+#| df-print: paged
+wiki_lit
+```
+
+Use the arrows and page numbers to see what kind of data can be found in its three columns. It's a pretty basic table, but that makes it ideal for practice.
+
+Although R can do lots with the functions built in, we can add to its functionality by using packages for specific functions. For this tutorial, we'll be using functions from the package called `tidyverse`, so we'll want to load it up here with the `library()` function:
+
+```{r}
+#| label: packages1
+#| message: false
+#| warning: false
+library(tidyverse)
+```
+
+Loading a package may make some messages print. Unless there's an error, these can generally be ignored.
+
+## Exploring tables
+
+There are a few options for exploring a table when it might be too big to see at once. Usually, it's a good idea to first get a sense of its size before trying to see what it has on the inside.
+
+Functions like `dim()`, `nrow()`, and `ncol()` are great for finding out the numbers of rows and columns. Unlike the other two functions, `dim()` returns two numbers at once.
+
+```{r}
+#| label: dimensions1
+dim(wiki_lit)
+nrow(wiki_lit)
+ncol(wiki_lit)
+```
+
+Next, the `summary()` and `glimpse()` functions are a good way to see what kind of data is in a table. The first of these is especially good to see a range of numerical data, as shown below for the `year` column. As we can see from running the code below, the oldest book in our data set was from 1794, and the newest was from 2000.
+
+```{r}
+#| label: summary1
+summary(wiki_lit)
+```
+
+The `glimpse()` function turns the table on the side and shows the first few values of each column. It's not very helpful for the `wiki_lit` data set, which is quite narrow, but it's handy when working with tables with many columns:
+
+```{r}
+#| label: summary2
+glimpse(wiki_lit)
+```
+
+Lastly, the `head()` and `tail()` functions print a few rows from the table's top or bottom. By default, they show 6 rows, but an optional argument will change this number.:
+
+```{r}
+#| label: peek1
+head(wiki_lit)
+tail(wiki_lit, 3)
+```
+
+Once you have a sense of the table and you want to see the whole thing, the name will return the whole thing:
+
+```{r}
+#| label: whole1
+#| df-print: paged
+wiki_lit
+```
+
+When working in RStudio, the `View()` function will also be super handy. For instance, `View(wiki_lit)` will open the table in a larger, easier to see format.
+
+## Selecting columns
+
+If a data set has many columns, there's a good chance that we're interested in only a few of them. To simplify things, the `select()` function let's us choose which columns we want to work with.
+
+If we don't care about the year a book was published in, we can use `select()` to choose only the `title` and `nation` columns:
+
+```{r}
+#| label: select1
+
+wiki_lit2 <- select(wiki_lit, title, nation)
+
+wiki_lit2
+```
+
+Generally with R, using a function doesn't change the data we're looking at unless we also save it with the assignment arrow `<-`. Here, we're saving the steps with new names so that the original data is still there if we need it.
+
+Notice that the table's name and the column names are separated by commas. Alternatively, if we just want to drop a column, we can use the minus sign to "unselect" it. The following code will result in the same data frame:
+
+```{r}
+#| label: select2
+
+wiki_lit3 <- select(wiki_lit, -year)
+
+wiki_lit3
+```
+
+## Filtering rows
+
+Sometimes we want to show only a small set of rows. For instance, we might only be interested in novels in our data set that were published before 1810. The `filter()` function makes it easy to test a row for certain parameters like this, using operators like the less than arrow `<` to check for certain values:
+
+```{r}
+#| label: filter1
+filter(wiki_lit, year < 1810)
+```
+
+With commas, we can add any logical test to further limit data to certain rows. For instance, if we want to find only the novels published before 1810 that are American, we can add one more test. Here, line breaks in the code below make things easier to read; since R doesn't typically care about spacing, it's a good idea to make things easier for humans to read.
+
+```{r}
+#| label: filter2
+filter(wiki_lit, 
+       year < 1810, 
+       nation == "American")
+```
+
+Notice here that the last line uses two equal signs `==` instead of one. This difference is necessary because a single equal sign is how we define arguments in a function.
+
+### Logical tests
+
+The list of possible logical tests is kind of long, but many of them are just slight variations of one another. Using logical tests inside the `filter()` function will return only those rows where the condition is true.
+
++---------------+--------------------------------------+---------------------+
+| test          | description                          | use                 |
++===============+======================================+=====================+
+| `x > y`       | Is `x` greater than `y`?             | `3 > 4` is `FALSE`  |
+|               |                                      |                     |
+|               |                                      | `2 > 2` is `FALSE`  |
++---------------+--------------------------------------+---------------------+
+| `x < y`       | Is `x` less than `y`?                | `3 < 4` is `TRUE`   |
+|               |                                      |                     |
+|               |                                      | `2 < 2` is `FALSE`  |
++---------------+--------------------------------------+---------------------+
+| `x == y`      | Is `x` equal to `y`?                 | `3 == 4` is `FALSE` |
+|               |                                      |                     |
+|               |                                      | `2 == 2` is `TRUE`  |
++---------------+--------------------------------------+---------------------+
+| `x >= y`      | Is `x` greater than or equal to `y`? | `3 >= 4` is `FALSE` |
+|               |                                      |                     |
+|               |                                      | `2 >= 2` is `TRUE`  |
++---------------+--------------------------------------+---------------------+
+| `x <= y`      | Is `x` less than or equal to `y`?    | `3 <= 4` is `TRUE`  |
+|               |                                      |                     |
+|               |                                      | `2 <= 2` is `TRUE`  |
++---------------+--------------------------------------+---------------------+
+| `x ≠ y`       | Is `x` unequal to `y`?               | `3 ≠ 4` is `TRUE`   |
+|               |                                      |                     |
+|               |                                      | `2 ≠ 2` is `FALSE`  |
++---------------+--------------------------------------+---------------------+
+
+: Logical tests are useful for filtering data.
+
+Only some of these make sense when filtering text, but others are especially designed to test text data:
+
++-------------------------------------------------------+------------------------------------------------------------------------------------------------------------+----------------------------------------------+
+| test                                                  | description                                                                                                | use                                          |
++=======================================================+============================================================================================================+==============================================+
+| `x == y`                                              | Is `x` equal to `y`?                                                                                       | `"cat" == "dog"` is `FALSE`                  |
+|                                                       |                                                                                                            |                                              |
+|                                                       |                                                                                                            | `"cat" == "cat"` is `TRUE`                   |
++-------------------------------------------------------+------------------------------------------------------------------------------------------------------------+----------------------------------------------+
+| `x ≠ y`                                               | Is `x` unequal to `y`?                                                                                     | `"cat" ≠ "dog"` is `TRUE`                    |
+|                                                       |                                                                                                            |                                              |
+|                                                       |                                                                                                            | `"cat" ≠ "cat"` is `FALSE`                   |
++-------------------------------------------------------+------------------------------------------------------------------------------------------------------------+----------------------------------------------+
+| `str_detect(x, y)`                                    | Does the string `y` appear somewhere as part of the string `x`? The order of arguments makes a difference. | `str_detect("grambling", "gram")` is `TRUE`  |
+|                                                       |                                                                                                            |                                              |
+| (Think of `x` as the haystack and `y` as the needle.) |                                                                                                            | `str_detect("gram", "grambling")` is `FALSE` |
++-------------------------------------------------------+------------------------------------------------------------------------------------------------------------+----------------------------------------------+
+| `x %in% y`                                            | Does `x` appear somewhere as part of `y`? The order of arguments makes a difference.                       | `y <- c("cat", "dog", "fish")`               |
+|                                                       |                                                                                                            |                                              |
+| (Think of `y` as the haystack and `x` as the needle.) |                                                                                                            | `"dog" %in% y` is `TRUE`                     |
+|                                                       |                                                                                                            |                                              |
+|                                                       |                                                                                                            | `"bird" %in% y` is `FALSE`                   |
+|                                                       |                                                                                                            |                                              |
+|                                                       |                                                                                                            | `3 %in% c(1, 2, 3)` is `TRUE`                |
++-------------------------------------------------------+------------------------------------------------------------------------------------------------------------+----------------------------------------------+
+
+: Some logical tests are well suited for text data.
+
+Surprisingly many items in our data set reference the name "Conan" somewhere in their titles. We can combine the `str_detect()` test with the `filter()` function to find these titles no matter where the word comes in the title:
+
+```{r}
+#| label: filter3
+filter(wiki_lit, str_detect(title, "Conan"))
+```
+
+## Arranging by values
+
+The `arrange()` function makes it very easy to organize data numerically or alphabetically. Consider the following organization of the `my_pets` table we made earlier:
+
+```{r}
+#| label: arrange1
+arrange(my_pets, type)
+```
+
+This code rearranges the data to be alphabetical by each pet `type`, starting with "bird," following by "cat," and so on. We can also add other columns to organize by. For instance, to alphabetize first by `type` and then by `name` within each type, this will do it:
+
+```{r}
+#| label: arrange2
+arrange(my_pets, type, name)
+```
+
+The `arrange()` function works in ascending order, counting up or going from A to Z. To reverse this order to be descending, add the `desc()` function to the mix:
+
+```{r arrange3, exercise.setup="dataframes2"}
+#| label: 
+arrange(my_pets, desc(age))
+```
+
+## Adding columns
+
+The `mutate()` function adds or changes the columns in a table. We can use it, for instance, to convert the age of my pets into dog years, shown in a new column called `dog_years`:
+
+```{r}
+#| label: mutate1
+#| caption: It's a good thing Pollyana isn't a dog!
+mutate(my_pets, dog_years = age * 7)
+```
+
+The `mutate()` function lets us add or change multiple columns at once:
+
+```{r}
+#| label: mutate3
+mutate(my_pets, 
+       type = toupper(type), 
+       dog_years = age * 7)
+```
+
+Remember that R doesn't really mind if we add line breaks after commas. Make things easy on yourself by adding some space to take a breath. Also, remember that these functions don't change any of an underlying data set or save our progress unless we also use the assignment arrow `<-` to save things. For instance, if we wanted to modify the `wiki_lit` data to add a column for the size of the title, we might want to save it like this:
+
+```{r}
+#| label: mutate7
+my_wiki_lit <- mutate(wiki_lit, title_size = nchar(title))
+```
+
+## Categorizing data
+
+Often, we'll want to use `mutate()` to add columns that vary based on some grouping. For instance, with the `my_pets` data set, we could be interested in studying just the age of each type of pet, so we'll create a smaller table:
+
+```{r}
+#| label: groupby1
+small_pets <- select(my_pets, type, age)
+
+small_pets
+```
+
+If we want to add a column showing the maximum age, we can use the `max()` function like this:
+
+```{r}
+#| label: groupby2
+mutate(small_pets, max_age=max(age))
+```
+
+This shows us the maximum age of all my pets, but it doesn't show the maximum age for each type. The `group_by()` function makes this easy, grouping the data by some category before adding any columns, like this:
+
+```{r}
+#| label: groupby3
+pet_groups <- group_by(small_pets, type)
+
+mutate(pet_groups, max_age=max(age))
+```
+
+Specifying by category is very powerful.
+
+## Adding plumbing with pipes
+
+Before moving any further, it's helpful to know the "pipe" command, which looks like this: `|>`. It's formed by typing the vertical bar symbol `|`, which is typically found underneath the "backspace" key on a Windows keyboard (called the "delete" key on a Mac), and the greater than symbol `>`.
+
+This pipe command is helpful because it allows us to chain many steps together without saving one step at a time. When you see a pipe, think "and then" while you're reading the code. With the pipe, each previous step becomes the first argument in the next function:
+
+```{r}
+#| label: pipe1
+
+wiki_lit |> 
+  select(title, nation) |> 
+  mutate(title_size = nchar(title)) |> 
+  group_by(nation) |> 
+  mutate(max_title_size = max(title_size))
+
+```
+
+Using the pipe in this way saves us from saving each individual step as a new variable name. The above code can be read like this:
+
+> Start with the `wiki_lit` data, **and then** select the columns showing the title and nation, **and then** mutate the data to create a new column showing the title size, **and then** group by nation, **and then** mutate to create a new title showing the maximum title size.
+
+## Summarize columns
+
+The `summarize()` function is good to summarize a big data set, shrinking all the rows and columns into just the items defined within it. Often, the results are just a single cell:
+
+```{r}
+#| label: summarize1
+summarize(my_pets, average_age = mean(age))
+```
+
+Now try it out with the `penguins` data set from the `palmerpenguins` package. Notice that we can summarize multiple columns at once. The `na.rm = TRUE` option allows us to ignore any rows that have missing data.
+
+```{r}
+#| label: summarize2
+#| message: false
+library(palmerpenguins)
+
+summarize(penguins, 
+          min_bill = min(bill_length_mm, na.rm = TRUE),
+          avg_bill = mean(bill_length_mm, na.rm = TRUE),
+          max_bill = max(bill_length_mm, na.rm = TRUE))
+```
+
+Although the `group_by()` function can be useful with `mutate()`, it makes a really big difference with `summarize()`. Consider using it here with the `my_pets` data set to find the average age of each type of my pets:
+
+```{r}
+#| label: summarize3
+my_pets |> 
+  group_by(type) |> 
+  summarize(avg_age = mean(age))
+```
+
+Or consider finding summary measures for each species of penguin:
+
+```{r}
+#| label: summarize4
+penguins |> 
+  group_by(species) |> 
+  summarize(min_bill = min(bill_length_mm, na.rm = TRUE),
+            avg_bill = mean(bill_length_mm, na.rm = TRUE),
+            max_bill = max(bill_length_mm, na.rm = TRUE))
+```
+
+We can use this same technique to figure out the minimum, median, and maximum numbers of letters per title in each of the national grouping of books in the `wiki_lit` data set.
+
+```{r}
+#| label: summarize5
+wiki_lit |> 
+  mutate(title_length = nchar(title)) |> 
+  group_by(nation) |> 
+  summarize(min_title_length = min(title_length),
+            med_title_length = median(title_length),
+            max_title_length = max(title_length))
+```

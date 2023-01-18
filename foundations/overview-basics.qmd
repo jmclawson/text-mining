@@ -1,0 +1,275 @@
+---
+title: "Overview"
+subtitle: "Basics of R and Simple Functions"
+order: 1
+description: "Reviewing key parts of using R, including variables and functions."
+categories: 
+  - introduction
+  - functions
+tutorials: 
+  - href: "http://jmclawson.shinyapps.io/ltm-01-basics/"
+    title: "01 - Basics"
+  - href: "http://jmclawson.shinyapps.io/ltm-02-functions/"
+    title: "02 - Functions"
+freeze: true
+---
+
+R is like a person who might seem intimidating at first, but who's actually really nice once you get to know them. We're starting the semester by getting to know R a little better so that we can get past what might seem like a stand-offish exterior to find that friendlier side. Before anything, this page is offered as an overview or re-introduction to some of the basics of working with R. Much of this material is available in two interactive tutorials, which offer a good way to practice what we go over:
+
+-  [01 - Basics of R](http://jmclawson.shinyapps.io/ltm-01-basics/)
+-  [02 - Basic Functions](http://jmclawson.shinyapps.io/ltm-02-functions/)
+
+The web page reinforces these tutorials with a static overview you can return to over time.
+
+## Basics of R
+
+### R is a fancy calculator
+
+The first lesson is that R is a fancy calculator. It's easy to add, subtract, multiply, and divide.
+
+```{r}
+#| label: calculator1
+2 + 2
+2 - 3
+2 * 4
+2 / 5
+```
+
+We can even use R to to more advanced math that needs parentheses to show an order of operations:
+
+```{r}
+#| label: calculator2
+((2 + 1) * (4 + 1)) / 3
+```
+
+We won't need to do a lot of math in a course like ours, but some of these basic steps may come in handy---and it's certainly helpful to know the operators for simple arithmetic, including addition (`+`), subtraction (`-`), multiplication (`*`), and division (`/`). More complex things will be handled by *functions*, which will be discussed further below.
+
+### R can save variables
+
+Any old calculator can add and multiply, but a fancy calculator can also save values to variable. And here we're talking of variables that are fancier than any from algebra, where "x" and "y" ruled the day. In R, variable names can be much fancier.
+
+To save variables, we'll use the less-than symbol (`<`) and the hyphen or minus sign (`-`) together to make an arrow: `<-`. This means we're saving whatever is on the right of the arrow into the variable named on the left. For instance, the following code saves the value "1901" to the variable we're creating called `grambling_founded`:
+
+```{r}
+#| label: variables1
+grambling_founded <- 1901
+```
+
+When saving a variable, it'll look like nothing has happened. But with any variable, we can type its name again to see what values are saved in it:
+
+```{r}
+#| label: variables1a
+grambling_founded
+```
+
+And now that we have that variable, we can use it as if it's any normal number---to find out, for instance, how many years have passed between the time Grambling was founded and the current year 2023:
+
+```{r}
+#| label: variables2
+2023 - grambling_founded
+```
+
+This example of Grambling's founding year is obviously pretty simple, since it won't change over time. But we can imagine a scenario where we have two variables that might change over time, while the calculation stays the same. Let's say, for instance, that we know that a double-spaced page can hold about 300 words, and we have ten pages to read. We'd figure out the total number of words with the following code:
+
+```{r}
+#| label: variables3a
+words_per_page <- 300
+pages_to_read <- 10
+
+words_per_page * pages_to_read
+```
+
+If any of these values change, we can update them without having to change the math in the last line:
+
+```{r}
+#| label: variables3
+words_per_page <- 600
+pages_to_read <- 15
+
+words_per_page * pages_to_read
+```
+
+Working with variables like this can make it easier to think through the work that needs doing by talking it out. Using variables means we don't have to remember the actual values, but we can call them up at any time.
+
+### R can save lists
+
+Sometimes it will come in handy to save multiple values to one variable name. Say for instance, you're keeping track of how many pages you read every night. It may be enough just to have a list of page numbers listed together.
+
+In R, we call this list of values a "vector." (We'll often use this word interchangeably with the word *list*, but it's maybe better to use *vector* because the other word also has other meanings in R.) And we can save the list like this:
+
+```{r}
+#| label: vectors1
+pages_read <- c(17, 40, 10, 14, 25, 8)
+```
+
+Notice that a vector needs three components:
+
+1.  There's a `c` at the front.
+2.  Parentheses surround everything.
+3.  Values are separated by commas.
+
+As with saving any variable, it'll look at first like nothing has happened, but we can type the variable name again to see what values are saved in it:
+
+```{r}
+#| label: vectors2a
+pages_read
+```
+
+Vectors are especially fancy, because we can do math on the entire vector at once. Let's say, for instance, that we realized we'd only been counting the front of every page, even though we also read the backs of the pages. Our page counts should be twice as big as they seems! Luckily, it's easy to do the same math on every item in a vector:
+
+```{r}
+#| label: vectors4
+pages_read * 2
+```
+
+As we'll see later on, vectors really shine when we use them in functions.
+
+### R can handle words
+
+Perhaps most importantly for a class like ours, R can also do fancy things with words. We'll learn about some of these techniques over the course of the semester. For now, it's enough to learn how to save "strings," which is another name for most values that aren't numbers. Here's the secret: quotation marks. Notice in the following example code that the line of text is surrounded by quotation marks.
+
+```{r}
+#| label: strings1
+dalloway <- "Mrs. Dalloway said she would buy the flowers herself."
+
+dalloway
+```
+
+The technique works anywhere someone might otherwise use numbers, including in vectors:
+
+```{r}
+#| label: strings2
+justine <- c("The", "sea", "is", "high", "again", "today")
+
+justine
+```
+
+## Basic Functions in R
+
+### What's a function?
+
+We actually saw our first function in one of the sections above. When we create a vector combining multiple values together in a list, we use the function `c()`. Remember this?
+
+```{r}
+#| label: functions1
+pages_read <- c(17, 40, 10, 14, 25, 8)
+
+pages_read
+```
+
+It's got a short name, so it looks pretty simple, but `c()` is a function like any other. We recognize it as a function because of three things:
+
+1.  The function's name starts with a letter that isn't in quotation marks. This function's name is just one letter, *c*, but functions can have longer names and even be made of combinations of letters, numbers, and underscores---as long as a letter comes first.
+2.  Immediately after the function name is a set of parentheses which *might* or *might not* have something inside them.
+3.  If there are multiple things inside the parentheses, they're separated by commas.
+
+It might be helpful to think of functions as verbs, with things inside the parentheses often filling the role of direct objects. We might say, for instance `read(book)` to say that we're using the function `read()` to read the thing called a book, or we might say `sing(song)` to say that we're using the function `sing()` to sing the thing called a song. In the case of the function, `c()`, it means something like "combine," so we're using the function `c()` to combine the numbers 17, 40, 10, 14, 25, and 8 into a vector.
+
+### Basic functions for numbers
+
+Many of R's functions are just extensions of the calculator. For instance, the `sqrt()` function will find the square root of whatever goes inside the parentheses.
+
+```{r}
+#| label: functions3
+sqrt(5)
+```
+
+Functions like `sqrt()` can only accept one value inside the parentheses. Other functions like `sort()` expect a vector:
+
+```{r}
+#| label: functions4
+dog_weight <- c(7, 40, 25, 10, 14, 8)
+
+sort(dog_weight)
+```
+
+### Basic statistics
+
+R is especially well suited for calculating basic statistics.
+
++-----------------+---------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+
+| function        | purpose                                                                                                                               | example                        |
++=================+=======================================================================================================================================+================================+
+| `mean()`        | calculate the average of a vector                                                                                                     | `mean(dog_weight)` is `17.333` |
++-----------------+---------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+
+| `max()`         | find the maximum value in a vector                                                                                                    | `max(dog_weight)` is `40`      |
++-----------------+---------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+
+| `min()`         | find the minimum value in a vector                                                                                                    | `min(dog_weight)` is `7`       |
++-----------------+---------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+
+| `median()`      | find the middlemost value in a vector; if a vector has an even number of values, calculate a number between the two middlemost values | `median(dog_weight)` is `12`   |
++-----------------+---------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+
+| `sd()`          | calculate the standard deviation of a vector                                                                                          | `sd(dog_weight)` is `12.894`   |
++-----------------+---------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+
+| `length()`      | count the number of items in a vector                                                                                                 | `length(dog_weight)` is `6`    |
++-----------------+---------------------------------------------------------------------------------------------------------------------------------------+--------------------------------+
+
+: The statistics functions in R make it more than just a calculator.
+
+### Basic functions for words
+
+Finally, and again most usefully for a class like ours, R offers some handy functions for working with words. Consider these opening lines from three books:
+
+```{r}
+#| label: words1
+dalloway <- "Mrs. Dalloway said she would buy the flowers herself."
+
+justine <- "The sea is high again today, with a thrilling flush of wind."
+
+ulysses <- "Stately, plump Buck Mulligan came from the stairhead, bearing a bowl of lather on which a mirror and a razor lay crossed. A yellow dressing gown, ungirdled, was sustained gently behind him by the mild morning air. He held the bowl aloft and intoned: Introibo ad altare Dei."
+
+dalloway
+justine
+ulysses
+```
+
+These are great openings to great books. R will let us study this kind of writing by using powerful functions and methods. But first, it'll be helpful to learn a few basic functions for working with strings.
+
+#### Changing case
+
+The functions `toupper()` and `tolower()` are a good place to start. They are useful to convert letters to uppercase or lowercase:
+
+```{r}
+#| label: words2
+toupper(justine)
+tolower(dalloway)
+```
+
+#### Splitting up strings
+
+Sometimes we want to look more closely at smaller parts of a chunk of text. Instead of an entire paragraph, for instance, we might want to focus on a text sentence-by-sentence The `strsplit()` function helps to break longer strings into smaller parts. See it in action here:
+
+```{r}
+#| label: words4
+strsplit(ulysses, split = "[.]")
+```
+
+Here, we see that the `ulysses` text was split into three sentences, and each sentence's period was removed. Unlike `toupper()` and `tolower()`, the `strsplit()` function expects a second parameter inside the parentheses. The first parameter is the text to be split. The second parameter, `split`, defines which characters to split at. Using something like `split = "[.]"` divides at every period, letting us look at individual sentences, one at a time.
+
+Because the period is a special character with special meaning, it has to be put in square brackets, but most other characters don't need brackets. An empty space, for instance, will work fine without the brackets. Here it is dividing `justine` at every word:
+
+```{r}
+#| label: words5
+strsplit(justine, split = " ")
+```
+
+#### Pasting strings together
+
+We don't always want to split up strings into smaller pieces. Sometimes we want to build them up to longer lengths. The `paste()` function makes this possible.
+
+```{r}
+#| label: words6
+halo_1 <- "Remember those walls I built?"
+halo_2 <- "Well, baby, they're tumbling down."
+
+paste(halo_1, halo_2)
+```
+
+The `paste()` function can also collapse a vector into a single string. Just set the `collapse` argument:
+
+```{r}
+#| label: words7
+hidden_message <- c("You're", "getting", "good", "at", "this!")
+
+paste(hidden_message, collapse = " ")
+```
+
