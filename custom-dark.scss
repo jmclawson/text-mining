@@ -114,3 +114,7 @@ nav.navbar {
 .navbar-dark .navbar-brand, .navbar-dark .navbar-brand .nav-link, .nav-link {
   color: $white;
 }
+
+div.sourceCode+.cell-output pre code, div.sourceCode+div.cell-output-display div.pagedtable-wrapper {
+  background-color: $darkblackpink;
+}
