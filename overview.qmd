@@ -28,6 +28,17 @@ listing:
     field-display-names:
       title: "Lesson"
       reading-time: "Time"
+  - id: simplefeatures
+    contents: "simple-features/*.qmd"
+    template: overview.ejs
+    filter-ui: false
+    sort-ui: false
+    table-hover: true
+    sort: order
+    fields: [title, description, reading-time]
+    field-display-names:
+      title: "Lesson"
+      reading-time: "Time"
   - id: classification
     contents: "classification/*.qmd"
     template: overview.ejs
@@ -46,18 +57,22 @@ listing:
 ::: {#foundations}
 :::
 
-## II. [Mining for Simple Features](features.qmd)
+## II. [Mining for Simple Features and Sentiment](simple-features.qmd)
 
--   Text in Context: Finding Needles in Haystacks
--   Counts, Clouds, and Columns: Moving from Words to Numbers
--   NLP Transformations: Treating Words as Words
+::: {#simplefeatures}
+:::
 
-## III. [Sentiment Analysis](sentiment.qmd)
-
--   Sentiment at Large: Measuring Document-Level Sentiment
+-   Once More with Feeling: Sentiment Analysis
+<!-- -   NLP Transformations: Treating Words as Words -->
+<!-- -   Sentiment at Large: Measuring Document-Level Sentiment -->
 -   Sentiment over Time: Finding the Plot
 
-## IV. [Text Classification](classification.qmd)
+## III. [Mining for Complex Features and Correlation](complex-features.qmd)
+
+-   Distinctive Words: Measuring Nuance with Tf-Idf
+-   Relationships and Interactions among Words: N-grams, Phrases, and Correlation
+
+## IV. [Text Clustering and Classification](classification.qmd)
 
 -   Multidimensional Measures: Kissing the Joy as it Flies
 -   Similarity and Difference: Calculating Distance between Texts

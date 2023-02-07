@@ -19,4 +19,6 @@ Text sets sourced from University of North Carolina's [*Documenting the American
 
 Title photo for "Introduction to Text Analysis" slides by [Vladislav Klapin](https://unsplash.com/@lemonvlad?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) on [Unsplash](https://unsplash.com/s/photos/introduction?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText).
 
+Title photo for "Distant Reading" slides by [Geoff Bryant](https://unsplash.com/fr/@hortiphoto?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) on [Unsplash](https://unsplash.com/s/photos/distant-mountains?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText).
+
 ## Acknowledgements

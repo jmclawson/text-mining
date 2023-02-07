@@ -16,8 +16,8 @@ freeze: true
 
 Where R really shines is in the ways it helps us work with structured data, or data that is organized in tables with rows and columns. Before reading through this page, it might be a good idea to work through it in two interactive tutorials, which will offer a good way to practice what we cover here:
 
--  [03 - Tables, part 1](http://jmclawson.shinyapps.io/ltm-03-tables-1/)
--  [04 - Tables, part 2](http://jmclawson.shinyapps.io/ltm-04-tables-2/)
+-   [03 - Tables, part 1](http://jmclawson.shinyapps.io/ltm-03-tables-1/)
+-   [04 - Tables, part 2](http://jmclawson.shinyapps.io/ltm-04-tables-2/)
 
 The web page reinforces these tutorials with a static overview you can return to over time.
 
@@ -38,7 +38,6 @@ my_pets
 When data is structured like this, we'll talk about columns, which go up and down, and rows, which run side to side. To remember the difference, think of the columns you might see in classical architecture.
 
 [![By Steve Swayne - File:O Partenon de Atenas.jpg, originally posted to Flickr as The Parthenon Athens, CC BY 2.0](http://jmclawson.net/The_Parthenon_in_Athens.jpg)](https://commons.wikimedia.org/w/index.php?curid=17065839)
-
 
 Most commonly, the rows indicate observations or instances (in this case, each row is one pet), and columns indicate variables or features of that observation. Every cell has just one value in it.
 
@@ -172,33 +171,33 @@ Notice here that the last line uses two equal signs `==` instead of one. This di
 
 The list of possible logical tests is kind of long, but many of them are just slight variations of one another. Using logical tests inside the `filter()` function will return only those rows where the condition is true.
 
-+---------------+--------------------------------------+---------------------+
-| test          | description                          | use                 |
-+===============+======================================+=====================+
-| `x > y`       | Is `x` greater than `y`?             | `3 > 4` is `FALSE`  |
-|               |                                      |                     |
-|               |                                      | `2 > 2` is `FALSE`  |
-+---------------+--------------------------------------+---------------------+
-| `x < y`       | Is `x` less than `y`?                | `3 < 4` is `TRUE`   |
-|               |                                      |                     |
-|               |                                      | `2 < 2` is `FALSE`  |
-+---------------+--------------------------------------+---------------------+
-| `x == y`      | Is `x` equal to `y`?                 | `3 == 4` is `FALSE` |
-|               |                                      |                     |
-|               |                                      | `2 == 2` is `TRUE`  |
-+---------------+--------------------------------------+---------------------+
-| `x >= y`      | Is `x` greater than or equal to `y`? | `3 >= 4` is `FALSE` |
-|               |                                      |                     |
-|               |                                      | `2 >= 2` is `TRUE`  |
-+---------------+--------------------------------------+---------------------+
-| `x <= y`      | Is `x` less than or equal to `y`?    | `3 <= 4` is `TRUE`  |
-|               |                                      |                     |
-|               |                                      | `2 <= 2` is `TRUE`  |
-+---------------+--------------------------------------+---------------------+
-| `x ≠ y`       | Is `x` unequal to `y`?               | `3 ≠ 4` is `TRUE`   |
-|               |                                      |                     |
-|               |                                      | `2 ≠ 2` is `FALSE`  |
-+---------------+--------------------------------------+---------------------+
++----------+--------------------------------------+---------------------+
+| test     | description                          | use                 |
++==========+======================================+=====================+
+| `x > y`  | Is `x` greater than `y`?             | `3 > 4` is `FALSE`  |
+|          |                                      |                     |
+|          |                                      | `2 > 2` is `FALSE`  |
++----------+--------------------------------------+---------------------+
+| `x < y`  | Is `x` less than `y`?                | `3 < 4` is `TRUE`   |
+|          |                                      |                     |
+|          |                                      | `2 < 2` is `FALSE`  |
++----------+--------------------------------------+---------------------+
+| `x == y` | Is `x` equal to `y`?                 | `3 == 4` is `FALSE` |
+|          |                                      |                     |
+|          |                                      | `2 == 2` is `TRUE`  |
++----------+--------------------------------------+---------------------+
+| `x >= y` | Is `x` greater than or equal to `y`? | `3 >= 4` is `FALSE` |
+|          |                                      |                     |
+|          |                                      | `2 >= 2` is `TRUE`  |
++----------+--------------------------------------+---------------------+
+| `x <= y` | Is `x` less than or equal to `y`?    | `3 <= 4` is `TRUE`  |
+|          |                                      |                     |
+|          |                                      | `2 <= 2` is `TRUE`  |
++----------+--------------------------------------+---------------------+
+| `x != y` | Is `x` unequal to `y`?               | `3 != 4` is `TRUE`  |
+|          |                                      |                     |
+|          |                                      | `2 != 2` is `FALSE` |
++----------+--------------------------------------+---------------------+
 
 : Logical tests are useful for filtering data.
 
@@ -211,9 +210,9 @@ Only some of these make sense when filtering text, but others are especially des
 |                                                       |                                                                                                            |                                              |
 |                                                       |                                                                                                            | `"cat" == "cat"` is `TRUE`                   |
 +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------+----------------------------------------------+
-| `x ≠ y`                                               | Is `x` unequal to `y`?                                                                                     | `"cat" ≠ "dog"` is `TRUE`                    |
+| `x != y`                                              | Is `x` unequal to `y`?                                                                                     | `"cat" != "dog"` is `TRUE`                   |
 |                                                       |                                                                                                            |                                              |
-|                                                       |                                                                                                            | `"cat" ≠ "cat"` is `FALSE`                   |
+|                                                       |                                                                                                            | `"cat" != "cat"` is `FALSE`                  |
 +-------------------------------------------------------+------------------------------------------------------------------------------------------------------------+----------------------------------------------+
 | `str_detect(x, y)`                                    | Does the string `y` appear somewhere as part of the string `x`? The order of arguments makes a difference. | `str_detect("grambling", "gram")` is `TRUE`  |
 |                                                       |                                                                                                            |                                              |

@@ -7,7 +7,10 @@ categories:
 order: 3
 df-print: default
 description: "Introducing approaches for reading text files, using Grambling's alma maters as a case study."
-draft: true
+tutorials: 
+  - href: "http://jmclawson.shinyapps.io/ltm-05-structure/"
+    title: "05 - Adding Structure to Unstructured Text"
+draft: false
 freeze: true
 ---
 
@@ -15,11 +18,12 @@ There are certain considerations to keep in mind when working with text in any k
 
 ## Getting started
 
-As always, it's a good idea to start by loading packages. We'll usually build on packages in the `tidyverse` set of packages, so let's just start there:
+As always, it's a good idea to start by loading packages. We'll usually build on packages in the `tidyverse` set of packages, so let's start there. Later on, we'll also be using the `tidytext` package for *tokenizing* the text (defining what constitutes a word):
 
 ```{r}
 #| message: false
 library(tidyverse)
+library(tidytext)
 ```
 
 That's all we'll need in this lesson. Later lessons will use more.
@@ -46,11 +50,13 @@ alma_mater <- data.frame(
 alma_mater
 ```
 
+### Adding stanza markers
+
 As noted previously, the ninth line here is blank, which is a helpful way to recognize a new stanza. Since there's only two stanzas here, we *could* define things manually:
 
 ```{r}
 alma_mater |> 
-  mutate(stanza = c(1, 1, 1, 1, 1, 1, 1, 1, NA, 2, 2, 2, 2, 2, 2, 2, 2))
+  mutate(stanza_num = c(1, 1, 1, 1, 1, 1, 1, 1, NA, 2, 2, 2, 2, 2, 2, 2, 2))
 ```
 
 But doing things manually like this is a mess. It introduces room for mistakes, it isn't easy, and it gets even tougher when we have longer poems. For this purpose, the `cumsum()` function---for "cumulative sum"---can be a good way of adding up all the spaces. Using a logical test inside the parenthesis means it'll add an increment for each time it's true:
@@ -58,22 +64,30 @@ But doing things manually like this is a mess. It introduces room for mistakes, 
 ```{r}
 alma_mater |> 
   mutate(
-    stanza = cumsum(text == ""))
+    stanza_num = cumsum(text == ""))
 ```
 
-This is almost perfect. The only problem is that it should start at *one* instead of *zero*. That's easy to fix by adding 1. While we're at it, we'll exclude the blank line using `filter()`, since it doesn't add any data, we'll add the line number using the `row_number()` function, and we'll move these metadata columns before the text column using `relocate()`:
+Here, the test inside `cumsum()` matches every time the `text` column is equal to "" (or a blank), so it increments a counter in the `stanza_num` column. And it's almost perfect! The only problem is that it should start at *one* instead of *zero*. That's easy to fix by adding 1. While we're at it, we'll exclude the blank line using `filter()`, since it doesn't add any data.
 
 ```{r}
 alma_mater <- 
   alma_mater |> 
-  mutate(
-    stanza = cumsum(text == "") + 1) |> 
-  filter(text != "") |> 
-  mutate(
-    line = row_number()) |> 
-  relocate(
-    stanza, line,
-    .before = text)
+  mutate(stanza_num = cumsum(text == "") + 1) |> 
+  filter(text != "")
+
+alma_mater
+```
+
+### Adding line markers
+
+Line numbers are even easier to add using the `row_number()` function. Here, we use it with `mutate()`, and we'll move the metadata columns before the text column using `relocate()`:
+
+```{r}
+alma_mater <- 
+  alma_mater |> 
+  mutate(line_num = row_number()) |> 
+  relocate(stanza_num, line_num,
+           .before = text)
 
 alma_mater
 ```
@@ -82,44 +96,23 @@ alma_mater
 
 Organizing the lyrics by line makes sense in some circumstances, but it's also reasonable to read the lyrics on a word-by-word basis. For this reason, some may even argue that a row-per-word is a "tidier" structure.
 
-The `strsplit()` function allows us to divide the text at every character of our choosing, such as a space. To see how it works, let's try it out with the first line of Grambling's alma mater:
+When we think about splitting up by words, it's important to keep in mind not only the ways we recognize word boundaries, but also what we're after:
 
-```{r}
-strsplit(
-  "Old Grambling, dear Grambling,", 
-  split = " ")
-```
+1.  We might assume spaces are sufficient to define word boundaries. In some circumstances---such as this sentence, which contains an em-dash interruption---spaces may not be sufficient to show word boundaries.
+2.  Breaking up by spaces will also keep punctuation marks like commas and periods connected to words.
+3.  Simply splitting by spaces keeps capitalization. Is a given word capitalized because it's a proper noun (and thus the capitalization is part of its spelling) or because of where it falls in the sentence (at the beginning)? When we remove the context of sentences, capitalization is more confusing than revealing, so we'll typically want to normalize letter case when splitting things up by words.
 
-Here, we defined two arguments inside the parentheses: first is the text we want to split, and second is the character by which to split it. The result is a list of four items, with one item for each word.
-
-Let's see what happens when we apply this function to our data set:
+Lucky for us, the `tidytext` package provides a handy one-step function `unnest_tokens()` to hit all three marks, standardizing letters into lower case and separating words at spaces and punctuation.
 
 ```{r}
 alma_mater |> 
-  mutate(text = strsplit(text, 
-                         split = " "))
+  unnest_tokens(word, text) |> 
+  head()
 ```
 
-Our text column now prints each word in a list separated by commas. This looks very messy, but it's just one step from what we need. The `unnest()` function will let us simplify these lists so that each row contains only a single word:
-
-```{r}
-alma_mater |> 
-  mutate(text = strsplit(text, " ")) |> 
-  unnest(text)
-```
-
-The resulting table has grown from 16 rows (for 16 lines of lyrics) to 100 rows (for 100 words). While we're at it, let's add one more column showing each word's number in its line:
-
-```{r}
-alma_mater |> 
-  mutate(text = strsplit(text, " ")) |> 
-  unnest(text) |> 
-  group_by(school, line) |> 
-  mutate(num = row_number()) |> 
-  ungroup() |> 
-  relocate(num,
-           .before = text)
-```
+::: callout-note
+This function's name introduces the term *token*, related to the word *tokenizing* which means the splitting of a longer text into the smallest pieces used in analysis. When we're considering frequency of words, our tokens will be the words themselves, and our process of tokenizing solidifies certain decisions of capitalization (that it is a distraction) and punctuation (that it is irrelevant) appropriate to that method.
+:::
 
 ## Making a function
 
@@ -127,20 +120,14 @@ Putting it all together into a single code chunk, we can see that the whole thin
 
 ```{r}
 alma_mater <- 
-  data.frame(school = "gram",
-             text = readLines("data/almamater_gram.txt")) |> 
-  mutate(
-    stanza = cumsum(text == "") + 1) |> 
+  tibble(school = "gram",
+         text = readLines("data/almamater_gram.txt")) |> 
+  mutate(stanza_num = cumsum(text == "") + 1) |> 
   filter(text != "") |> 
-  mutate(line = row_number(),
-         text = strsplit(text, " ")) |> 
-  unnest(text) |> 
-  group_by(school, line) |> 
-  mutate(num = row_number()) |> 
-  ungroup() |> 
-  relocate(
-    stanza, line, num,
-    .before = text) 
+  mutate(line_num = row_number()) |> 
+  unnest_tokens(word, text) |> 
+  relocate(stanza_num, line_num,
+           .before = word) 
 
 alma_mater
 ```
@@ -153,27 +140,21 @@ tidy_alma <- function(school){
                  school,
                  ".txt")
   
-  data.frame(school = school,
-             text = readLines(file)) |> 
-  mutate(
-    stanza = cumsum(text == "") + 1) |> 
+  tibble(school = school,
+         text = readLines(file)) |> 
+  mutate(stanza_num = cumsum(text == "") + 1) |> 
   filter(text != "") |> 
-  mutate(line = row_number(),
-         text = strsplit(text, " ")) |> 
-  unnest(text) |> 
-  group_by(school, line) |> 
-  mutate(num = row_number()) |> 
-  ungroup() |> 
-  relocate(
-    stanza, line, num,
-    .before = text) 
+  mutate(line_num = row_number()) |> 
+  unnest_tokens(word, text) |> 
+  relocate(stanza_num, line_num,
+           .before = word) 
 }
 ```
 
 From here, a single function call will get us the tidied alma mater of any school in our folder:
 
 ```{r}
-tidy_alma("gram")
+tidy_alma("uapb")
 tidy_alma("subr")
 tidy_alma("jsums")
 ```

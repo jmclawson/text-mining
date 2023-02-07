@@ -1,0 +1,262 @@
+---
+title: "Counts, Columns, and Clouds"
+subtitle: "From Words to Numbers and Pictures"
+categories: 
+  - frequencies
+  - visualization
+order: 1
+df-print: paged
+fig-cap-location: margin
+tbl-cap-location: margin
+description: "Counting word frequencies and creating visualizations."
+tutorials: 
+  - href: "http://jmclawson.shinyapps.io/ltm-06-frequency-count/"
+    title: "06 - Counting Word Frequencies"
+  - href: "http://jmclawson.shinyapps.io/ltm-07-frequency-vis/"
+    title: "07 - Visualizing Word Frequencies"
+freeze: false
+draft: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(tidyverse)
+library(tidytext)
+
+
+source("https://gist.githubusercontent.com/jmclawson/65899e2de6bfee692b08141a98422240/raw/7c5590377332e427691f2331b69abd58be2141ec/get_if_needed.R")
+
+for(x in c("aamu", "alasu", "alcorn", 
+           "cookman", "famu", "gram", 
+           "jsums", "mvsu", "pvamu", 
+           "subr", "tsu", "uapb")) {
+  paste0("https://jmclawson.net/text-mining/data/almamaters/almamater_",
+       x,
+       ".txt") |> 
+    get_if_needed()
+}
+
+tidy_alma <- function(school){
+  file <- paste0("data/almamater_",
+                 school,
+                 ".txt")
+  
+  tibble(school = school,
+         text = readLines(file)) |> 
+  mutate(stanza_num = cumsum(text == "") + 1) |> 
+  filter(text != "") |> 
+  mutate(line_num = row_number()) |> 
+  unnest_tokens(word, text) |> 
+  relocate(stanza_num, line_num,
+           .before = word) 
+}
+
+```
+
+
+Once unstructured text data is structured in a table, there's a lot that can be done with it. Counting word frequencies is one of the simplest methods of text analysis, but it's no less useful. And once we have these word frequencies, we'll often want to communicate our findings with effective visualizations. Luckily, R makes this straightforward. 
+
+## Getting started
+As always, we'll start by loading packages. The `tidyverse` set of packages will be common in this class, as will the `tidytext` package. We're also adding `wordcloud2` for reasons that will soon become obvious.
+
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse)
+library(tidytext)
+library(wordcloud2)
+```
+
+## Counting words
+
+We left off in the [previous lesson](./foundations/structure.qmd) with the final product of a completed, structured table of text, and we made a function to simplify the process. As a reminder, here's how we use it to grab a table of data for Grambling's alma mater:
+
+```{r recap1}
+almamater <- tidy_alma("gram")
+
+almamater
+```
+
+Counting these words is easy with the function `count()`, and the function name is even easy to remember.
+
+```{r count1}
+almamater |> 
+  count(word)
+```
+
+This function wants to count things in a column, so we told it to look in the `word` column. It summarizes everything, returning a table with two columns: `word` contains one of every word in the alma mater, and `n` contains the frequency or <span style="text-decoration: underline;">n</span>umber of times that word was used.
+
+### Counting by different measures
+
+If we want to count a different column, it's easy to choose it by replacing the column name in the parentheses. Changing the column to `stanza_num`, for instance, gives us a word count for each stanza:
+
+```{r count3}
+almamater |> 
+  count(stanza_num)
+```
+
+### Arranging by size
+
+By default, this table is returned to us in alphabetical order. To see which words are the most important, we will want to organize this table by frequency instead. The `arrange()` function is useful for reordering rows in a data set, and the `desc()` function puts things in descending order. Used together, they arrange the `n` column in descending order:
+
+```{r count4}
+almamater |> 
+  count(word) |> 
+  arrange(desc(n))
+```
+
+## Removing stop words
+
+The results show "grambling" as the most-used word, with "dear" and "old" rising very high up there as well. Anyone who has sung Grambling's alma mater will find these results unsurprising. But we might look a little further down and find words like "the," "to," and "and" in the mix as well. Articles, prepositions, conjunctions, and some other words don't add much insight when we're looking at things without phrasing. When we're studying something larger than a short poem, these words will often rise to the top, adding more noise to the signal.
+
+These kinds of words are known as "stop words." In many applications of text analysis---*but not all of them!*---it is common to remove stop words at some stage of the process. The `tidytext` package has a convenient table of stop words built into it. Here are the first few rows of that table:
+
+```{r stopwords1}
+get_stopwords() |> 
+  head()
+```
+
+We can use this on our alma mater data set to remove stop words from our frequencies. The `anti_join()` function is an easy way of removing from one table things that are found in another table. For our purposes, it's handy to remove any word found in the `word` column in both tables. In this step, we're saving results to a new object `frequencies` so that we can reuse it later.
+
+```{r stopwords2}
+frequencies <- almamater |> 
+  count(word) |> 
+  arrange(desc(n)) |> 
+  anti_join(get_stopwords())
+
+frequencies
+```
+
+Now that we've dropped the stop words, every word in our results contributes something.
+
+## Column plots
+
+Tables are fine, but graphs are easier to read and to share. Because the table is long, the `head()` function may be a good idea to limit it to the first few rows. Here, we're limiting it to the top 5 frequencies:
+
+```{r plotting1, exercise=TRUE, exercise.setup="recap1"}
+top_frequencies <- frequencies |>
+  head(5)
+
+top_frequencies
+```
+
+Now that we have the object saved, we can plot with `ggplot()`: 
+
+```{r plotting2}
+top_frequencies |> 
+  ggplot(aes(x = n, y = word)) +
+  geom_col()
+```
+
+### Explaining the code
+
+Calling `ggplot()` for a chart like this will look really similar every time we do it, so let's break the code down to understand the parts better:
+
+<code style="display: block; padding-left: 1.5em; text-indent: -0.75em; width: 100%; white-space: normal; font-size: 120%;"><span style="color: green;">top_frequencies</span> <span style="color: red;">|></span><br><span style="color: blue;">ggplot(</span><span style="color: purple;">aes(</span><span style="color: black;">x = </span><span style="color: green;">n</span><span style="color: black;">, y = </span><span style="color: green;">word</span><span style="color: purple;">)</span><span style="color: blue;">)</span> <span style="color: red;">+</span><br><span style="color: orange;">geom_col()</span></code>
+
+First, there are always two or three places where we'll bring in our data. The code starts with the name of our table, <code style="color: green;">top_frequencies</code>, and we're relating the X- and Y-axis coordinates to the two variables in that table that we want to plot: <code style="color: green;">n</code> and <code style="color: green;">word</code>.
+
+Next, it's important to be aware of what happens at the end of each line. We've been using the <code style="color: red;">|></code> (forward pipe) already, so it's not new. But once we begin plotting, new lines are connected using the <code style="color: red;">+</code> symbol.
+
+The plotting itself is handled by two functions. The <code style="color: blue;">ggplot()</code> function creates the base of a plot, and a function beginning <code style="color: orange;">geom_</code> says the kind of plot we want to make. The function <code style="color: orange;">geom_col()</code> indicates we want to chart <span style="text-decoration: underline;">col</span>umns, but we might instead chart points, lines, or many other things.
+
+Lastly, we call on a specialized function <code style="color: purple;">aes()</code> to map variables from our table to coordinates in the plot, defining what goes into the X-axis and Y-axis. When we put <code style="color: green;">word</code> on the Y-axis (the vertical axis), we did so because this axis is more readable for text to avoid words bumping together. And by putting <code style="color: green;">n</code> on the X-axis (the horizontal axis), we are making the length of each column correspond to that variable in our table. 
+
+### Flipping the chart
+
+What if we wanted to make a different chart, with the frequency `n` on the Y-axis and each `word` on the X-axis? It's easy to swap the variables for the `x` and `y` axes in the `aes()` function:
+
+```{r plotting3}
+top_frequencies |> 
+  ggplot(aes(x = word, y = n)) +
+  geom_col()
+```
+
+### Arranging by size
+
+As we saw in the second section above, the words have been arranged in alphabetical order, when we'd probably prefer them to be in order of their frequencies. The `reorder()` function makes it easy to reorder the `word` values by the values of `n`:
+
+```{r plotting4}
+top_frequencies |> 
+  ggplot(aes(x = n, y = reorder(word, n))) +
+  geom_col()
+```
+
+### Adding labels
+
+Reordering the Y-axis the chart cleaner in some areas and messier in others. That Y-axis has got to go! To add a little more polish, we'll call on the `labs()` function to change the <span style="text-decoration: underline;">lab</span>el<span style="text-decoration: underline;">s</span> and add a title. I'm setting the Y-axis label to `NULL` since the title makes this axis clear and we don't really need anything printed there:
+
+```{r plotting5}
+top_frequencies |> 
+  ggplot(aes(x = n, y = reorder(word, n))) +
+  geom_col() +
+  labs(x = "Frequency",
+       y = NULL,
+       title = "Most-used words in Grambling's alma mater")
+```
+
+
+## Word clouds
+
+Column plots are great for getting across a specific idea in a clear manner. But words have an emotional impact that we may sometimes wish to convey. For these moments, word clouds are just the ticket. 
+
+The `wordcloud2` package makes it really easy to create word clouds. Since our table includes nothing but words and their frequencies, the `wordcloud2()` function handles everything:
+
+:::{.column-page}
+```{r}
+#| label: wordcloud1
+wordcloud2(frequencies)
+```
+:::
+
+Hovering over the words will show the frequency of each.
+
+## Wrapping up
+
+Since we know how to create structured tables of words and we know how to measure word frequencies, things are really starting to sing (*pardon the pun!*). The code we've been building up can easily be repurposed to measure other texts, building analyses that do more, like this comparison of the top words of the alma maters of Grambling, Jackson, and Southern:
+
+```{r final1, echo=FALSE, eval=TRUE, exercise=FALSE, message=FALSE}
+
+get_alma <- function(uni) {
+  data.frame(school = uni,
+           text = readLines(paste0("data/almamater_", uni, ".txt"))) |> 
+  mutate(stanza_num = cumsum(text == "") + 1,
+         .after = school) |>
+  filter(text != "") |>
+  mutate(line_num = row_number(),
+         .after = stanza_num) |>
+  unnest_tokens(word, text) |> 
+  count(school, word) |> 
+  arrange(desc(n)) |> 
+  anti_join(get_stopwords()) |> 
+  head(10)
+}
+
+rbind(get_alma("jsums"), get_alma("subr"), get_alma("gram")) |> 
+  mutate(school = school |> 
+           str_replace_all("jsums", "Jackson") |> 
+           str_replace_all("gram", "Grambling") |> 
+           str_replace_all("subr", "Southern") |> 
+           as.factor(),
+         word = reorder_within(word, n, school)) %>%
+  ggplot(aes(y=word, x=n)) +
+  geom_col(aes(fill = school), 
+           # color = "black", 
+           show.legend = FALSE) +
+  facet_wrap(~school, scales="free_y") +
+  scale_y_reordered() +
+  theme_minimal() +
+  labs(title = "Grambling's alma mater repeats more words, more often.",
+       subtitle = "The alma maters of Grambling, Jackson, and Southern show notable differences.",
+       y = NULL,
+       x = "Repetitions of each word") +
+  theme(plot.title.position = "plot",
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank()) +
+  scale_x_continuous(breaks = scales::breaks_pretty()) +
+  scale_fill_manual(values = c("#ECAA00", "navy", "#69B3E7"))
+
+```
+
+
