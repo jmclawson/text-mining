@@ -70,7 +70,7 @@ library(wordcloud2)
 
 ## Counting words
 
-We left off in the [previous lesson](./foundations/structure.qmd) with the final product of a completed, structured table of text, and we made a function to simplify the process. As a reminder, here's how we use it to grab a table of data for Grambling's alma mater:
+We left off in the [previous lesson](../foundations/structure.qmd) with the final product of a completed, structured table of text, and we made a function to simplify the process. As a reminder, here's how we use it to grab a table of data for Grambling's alma mater:
 
 ```{r recap1}
 almamater <- tidy_alma("gram")
