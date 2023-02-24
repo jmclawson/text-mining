@@ -1,0 +1,288 @@
+---
+title: "Once More with Feeling"
+subtitle: "Analyzing Sentiment in Texts"
+categories: 
+  - sentiment
+  - visualization
+order: 1
+df-print: paged
+fig-cap-location: margin
+tbl-cap-location: margin
+description: "Adding consideration of sentiment to text analysis."
+freeze: false
+draft: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(tidyverse)
+library(tidytext)
+
+
+source("https://gist.githubusercontent.com/jmclawson/65899e2de6bfee692b08141a98422240/raw/7c5590377332e427691f2331b69abd58be2141ec/get_if_needed.R")
+
+for(x in c("aamu", "alasu", "alcorn", 
+           "cookman", "famu", "gram", 
+           "jsums", "mvsu", "pvamu", 
+           "subr", "tsu", "uapb")) {
+  paste0("https://jmclawson.net/text-mining/data/almamaters/almamater_",
+       x,
+       ".txt") |> 
+    get_if_needed()
+}
+
+tidy_alma <- function(school){
+  file <- paste0("data/almamater_",
+                 school,
+                 ".txt")
+  
+  tibble(school = school,
+         text = readLines(file)) |> 
+  mutate(stanza_num = cumsum(text == "") + 1) |> 
+  filter(text != "") |> 
+  mutate(line_num = row_number()) |> 
+  unnest_tokens(word, text) |> 
+  relocate(stanza_num, line_num,
+           .before = word) 
+}
+
+```
+
+Computers deal in cold hard facts, which makes it reasonable to use them for tasks like counting word frequencies. But they can do more. Techniques like sentiment analysis make it possible to use these digital methods to understand emotional resonance, too, scoring words based on simple correlation of sentiment.
+
+## Getting started
+
+As always, we'll start by loading packages. The `tidyverse` and `tidytext` packages are common for general data work and for text analysis. The second also provides some useful functions for interaction with data related to sentiment analysis. Lastly, the `wordcloud` package will help us visualize words sized in meaningful ways.
+
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse)
+library(tidytext)
+library(wordcloud)
+```
+
+## Sentiment defined
+
+Using the `get_sentiments()` function from the `tidytext` package will load up a list of words and their associated sentiments:
+
+```{r}
+get_sentiments()
+```
+
+This default list shows what's called the *Bing* lexicon. Other lexicons show different kinds of sentiments, and they can be loaded by putting the name of the lexicon in quotation marks as an argument to the function. Options include "bing", "afinn", "loughran", and "nrc". The NRC lexicon is especially interesting because it offers a chance to study the evocation of different kinds of emotions in finer detail than just "negative" and "positive":
+
+```{r}
+get_sentiments("nrc")
+```
+
+These tables are helpful for understanding emotional resonance in text, but they're not magical. Be willing to interrogate these correlations. Do they seem right to you? And even though they may not be perfect, are they potentially good enough?
+
+## Sentiment as a feature
+
+In past lessons, we've already seen that words can be counted as features for providing insight into documents. These words can also be used to generate other features, like sentiment.
+
+### Load text into table
+
+We'll start by pulling together a medium-sized set of texts and read them into R as a table. To do this, we'll use the `list_files()` function to find the file names of all the alma maters, and save them as a vector. Then we'll use `str_remove_all()` to remove the unnecessary parts of the file names, leaving only the school indicator. Finally, some fancy functions will load and combine everything into one table: `lapply()` will loop through each school with the `tidy_alma()` function, and `do.call(rbind, …)` will combine them.
+
+```{r}
+schools <- 
+  list.files("data/", 
+             pattern = "almamater_") |> 
+  str_remove_all("almamater_") |> 
+  str_remove_all(".txt")
+
+full_alma <- 
+  do.call(rbind, 
+          lapply(schools, tidy_alma))
+
+full_alma
+```
+
+### Add a sentiment column
+
+When our text documents are loaded into a table, it's just one step to add a sentiment column (as long as the table includes a column called `word`). Piping into an `inner_join()` function will get the job done:
+
+```{r}
+alma_sentiment <- 
+  full_alma |> 
+  inner_join(get_sentiments("bing"), 
+             by = "word")
+
+alma_sentiment
+```
+
+Now that we have a column for sentiment, there's a couple of ways we might use it.
+
+## Sentiment per university
+
+With a column for sentiment, we can count and pivot to see the distribution of sentiment for each university:
+
+```{r}
+sentiment_by_uni <- 
+  alma_sentiment |> 
+  count(school, sentiment) |> 
+  pivot_wider(
+    names_from = sentiment,
+    values_from = n,
+    values_fill = 0) |> 
+  mutate(
+    total_sentiment = positive - negative) |> 
+  arrange(desc(total_sentiment))
+
+sentiment_by_uni
+```
+
+These numbers suggest that this kind of measurement may be sensitive to the length of each document. For example, the alma mater for Florida A&M is about four times longer than that of Jackson State, so it ranks higher despite having a lower ratio of positive sentiment. For that reason, we might instead consider sentiment as a ratio, measuring positivity as a portion of the whole:
+
+```{r}
+sentiment_by_uni <- 
+  sentiment_by_uni |> 
+  mutate(
+    positive_ratio = total_sentiment / (positive + negative)) |> 
+  arrange(desc(positive_ratio), 
+          desc(total_sentiment))
+
+sentiment_by_uni
+```
+
+Controlling for size this way paints a clearer picture of how much each alma mater evokes positive or negative sentiments, noticeably changing the ordering.
+
+### Visualizing the positive ratio for each university
+
+This last table is best visualized with columns:
+
+```{r}
+sentiment_chart <- sentiment_by_uni |> 
+  ggplot(aes(x = positive_ratio,
+             y = reorder(school, 
+                         positive_ratio))) +
+  geom_col() +
+  labs(x = "Positivity of lyrics",
+       y = NULL,
+       title = "SWAC alma maters differ in sentiment")
+
+sentiment_chart
+```
+
+## Words per sentiment
+
+If instead we're curious to see which words contribute the most to our poles of sentiment, we can count the words for each sentiment:
+
+```{r}
+words_per_sentiment <- 
+  alma_sentiment |> 
+  count(sentiment, word,
+        sort = TRUE)
+
+words_per_sentiment
+```
+
+### Words as columns
+
+We can visualize these, too:
+
+```{r}
+words_per_sentiment |> 
+  group_by(sentiment) |> 
+  slice_max(order_by = n,
+            n = 5,
+            with_ties = FALSE) |> 
+  ungroup() |> 
+  ggplot(aes(x = n, 
+             y = reorder(word, n))) +
+  geom_col(aes(fill = sentiment),
+           show.legend = FALSE) +
+  facet_wrap(vars(sentiment),
+             scales = "free_y") +
+  labs(x = "Word frequency",
+       y = NULL,
+       title = "SWAC alma maters tend to repeat the same positive words, more often.",
+       subtitle = "Negative words are rarer, repeated less often.")
+```
+
+### Words in a cloud
+
+From the `wordcloud` package, the `comparison.cloud()` function makes it possible to compare the words that contribute the most to the positive and negative sentiments.
+
+```{r}
+words_per_sentiment |> 
+  pivot_wider(names_from = sentiment,
+              values_from = n,
+              values_fill = 0) |> 
+  column_to_rownames("word") |>
+  as.matrix() |> 
+  comparison.cloud(
+    colors = c("deeppink", "cornflowerblue"),
+    max.words = 150)
+```
+
+One thing to keep in mind is that word clouds communicate findings by asking the viewer to compare sizes of words. With a comparison word cloud like this one, the sizes of words on one side of the cloud relate only to the sizes of other words on the same side. The word "toil" may look similar in size to the word "love," but it is used far less often.
+
+## Possibilities of lexicon and corpus
+
+The examples shown here are pretty simple, comparing the "positive" and "negative" words in the lyrics of twelve songs. With a little work, this technique of studying sentiment with text data can yield surprising insights:
+
+```{r}
+#| code-fold: true
+# The ggtext package lets me add formatting like italics into the plot title
+library(ggtext)
+
+blake_sentiment <- 
+  # First, load the blake data
+  readRDS("data/blake_words.rds") |> 
+  # Then add data from "nrc" lexicon
+  left_join(get_sentiments("nrc") |> 
+              # include only 8 emotions
+              filter(!sentiment %in% c("positive", "negative")), 
+             by = "word") |> 
+  # get rid of words with no sentiment
+  drop_na(sentiment) |> 
+  # count sentiment values for each section
+  count(section, sentiment,)
+
+blake_sentiment |> 
+  # convert section numbers to names
+  mutate(section = case_when(
+    section == 1 ~ "Songs of Innocence",
+    TRUE ~ "Songs of Experience") |> 
+      # put them in non-alphabetic order
+      factor(levels = c("Songs of Innocence",
+                        "Songs of Experience"))) |> 
+  ggplot(aes(
+    # reorder Y-axis within each section
+    y = reorder_within(x = sentiment,
+                       by = n,
+                       within = section),
+    x = n)) +
+  geom_col(aes(fill = sentiment),
+           show.legend = FALSE) +
+  facet_wrap(vars(section),
+             scales = "free_y") +
+  # correction for mismatched y-axis ordering
+  scale_y_reordered() +
+  # nicer color palette
+  ggokabeito::scale_fill_okabe_ito() +
+  # omit gray background
+  theme_minimal() +
+  # set nice labels
+  labs(y = NULL,
+       x = "Words devoted to each sentiment",
+       # use markdown to show italics and break
+       title = "William Blake's *Songs of Innocence* are more joyful and less emotionally <br>complex than his *Songs of Experience*.") +
+  theme(
+    # horizontal grids aren't needed 
+    panel.grid.major.y = element_blank(),
+    # minimize vertical gridlines
+    panel.grid.minor.x = element_blank(),
+    # process markdown in title using ggtext
+    plot.title = element_markdown(),
+    # make facet titles italic
+    strip.text = element_text(face = "italic")) +
+  # remove space between bars and Y-axis text
+  scale_x_continuous(
+    expand = expansion(mult = c(0, 0)))
+  
+```

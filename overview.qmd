@@ -52,12 +52,12 @@ listing:
       reading-time: "Time"
 ---
 
-## I. [Foundations of Text Mining with R](foundations.qmd)
+## I. Foundations of Text Mining with R
 
 ::: {#foundations}
 :::
 
-## II. [Mining for Simple Features and Sentiment](simple-features.qmd)
+## II. Mining for Simple Features and Sentiment
 
 ::: {#simplefeatures}
 :::
@@ -67,12 +67,12 @@ listing:
 <!-- -   Sentiment at Large: Measuring Document-Level Sentiment -->
 -   Sentiment over Time: Finding the Plot
 
-## III. [Mining for Complex Features and Correlation](complex-features.qmd)
+## III. Mining for Complex Features and Correlation
 
 -   Distinctive Words: Measuring Nuance with Tf-Idf
--   Relationships and Interactions among Words: N-grams, Phrases, and Correlation
+-   More than Words: N-grams, Phrases, and Correlation
 
-## IV. [Text Clustering and Classification](classification.qmd)
+## IV.Text Clustering and Classification
 
 -   Multidimensional Measures: Kissing the Joy as it Flies
 -   Similarity and Difference: Calculating Distance between Texts
@@ -82,12 +82,12 @@ listing:
 ::: {#classification}
 :::
 
-## V. [Topic Modeling](topic.qmd)
+## V. Topic Modeling
 
 -   Tf-idf: Distinguishing among Documents
 -   Topic Modeling: Identifying Common Threads across Documents
 
-## VI. [Appendices](appendices.qmd)
+## VI. Appendices
 
 ::: {#appendices}
 :::

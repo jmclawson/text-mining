@@ -143,10 +143,74 @@ dickinson_all <-
             by = "href")
 ```
 
-Finally, convert the data frame to a tidy structure, with one token per row:
+Then convert the data frame to a tidy structure, with one token per row:
 
 ```{r}
 dickinson_tt <-
   dickinson_all |>
   unnest_tokens(word, text)
+```
+
+Before exporting, we'll add poem numbers according to the first line, drop the `href` column, and rename a couple columns:
+
+```{r}
+dickinson_tidy <-
+  dickinson_tt |>
+  mutate(
+    poem_num = poem |> 
+      factor(levels=unique(dickinson_tt$poem)) |> 
+      as.numeric(),
+    .after = poem) |> 
+  select(-href) |> 
+  rename(first_line = poem,
+         poem = poem_num)
+```
+
+## Write out poems
+
+To make it easier to study the poems in a class, it would be nice to have them in a set of text files. The whole lot of 597 poems is too much, but it's reasonable to work with, for instance, the first ten. So let's write them out to files here.
+
+To start, let's strategize with one poem:
+
+```{r}
+# Get a list of the first ten poems
+limited_poems <- dickinson_all |> 
+  filter(set == 1) |> 
+  select(poem) |> 
+  distinct() |> 
+  pull(poem) |> 
+  head(10)
+
+# Select only these
+dickinson_selection <- dickinson_all |> 
+  filter(set == 1,
+         poem %in% limited_poems) |> 
+  select(-href)
+
+# convert each stanza to a single block of text, and then convert each poem to a single block and vectorize
+dickinson_by_poems <- 
+  dickinson_selection |> 
+  # things get out of order unless I do this
+  mutate(row = row_number()) |> 
+  group_by(poem, stanza) |> 
+  summarize(text = paste0(text, collapse = "\n"),
+            minrow = min(row)) |>
+  summarize(text = paste0(text, collapse = "\n\n"),
+            minrow = min(minrow)) |>
+  arrange(minrow) 
+
+dickinson_vector <- dickinson_by_poems |> 
+  pull(text) |> 
+  setNames(dickinson_by_poems$poem)
+
+for(i in 1:length(dickinson_vector)) {
+  write_lines(
+    unname(dickinson_vector[i]),
+    paste0("data/Dickinson - ",
+           i, " - ",
+           names(dickinson_vector[i]),
+           ".txt"))
+}
+
+saveRDS(dickinson_tidy, file="data/dickinson_tidy.rds")
 ```

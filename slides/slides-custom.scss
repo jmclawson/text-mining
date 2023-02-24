@@ -34,3 +34,46 @@ $presentation-heading-text-transform: none;
   left: 4px !important;
   padding-left: 5px !important;
 }
+
+.reveal blockquote {
+    margin-top: auto;
+    margin-bottom: auto;
+    border-left: 0px;
+    font-family: $presentation-heading-font;
+}
+
+blockquote:before {
+    display: block;
+    padding-left: 10px;
+    content: "\201C";
+    font-size: 300%;
+    position: absolute;
+    left: -0.3em;
+    top: -0.1em;
+    color: $notwhite;
+}
+
+.reveal blockquote .cite {
+    display: block;
+    float: right;
+    color: $notwhite;
+    opacity: 0.99;
+}
+
+.reveal blockquote .cite:before {
+    content: "\2014 \2009";
+}
+
+.reveal .text-title {
+  font-family: $presentation-heading-font;
+  text-align: center;
+}
+
+.reveal .text-title p:first-of-type {
+  color: $notwhite;
+  font-size: var(--r-heading3-size);
+  font-weight: var(--r-heading-font-weight);
+  margin-left: 10%;
+  margin-right: 10%;
+}
+

@@ -1,0 +1,70 @@
+---
+title: "Distant Reading"
+author: "&nbsp; <br> &nbsp; <br> ENG 375 • week 5"
+format:
+  revealjs:
+    code-link: true
+    toc: false
+    theme: [moon, slides-custom.scss]
+    highlight-style: dracula
+    number-sections: false
+    echo: true
+    incremental: true
+    slide-number: true
+    chalkboard: true
+editor: visual
+image: geoff-bryant-pV4QnzUOIgs-unsplash.jpg
+title-slide-attributes:
+    data-background-image: geoff-bryant-pV4QnzUOIgs-unsplash.jpg
+    data-background-opacity: "0.5"
+---
+
+## Close and Distant Reading
+
+-   Close reading: common in literary studies
+    -   Close scrutiny of style or meaning
+    -   🔬 choice of tiny specimen 🦠
+-   Distant reading: new perspective
+    -   Shapes, patterns, trends
+    -   🔭 choice of big object 🪐
+
+##  {.center .text-title}
+
+"Distant Reading and Recent Intellectual History"
+
+by Ted Underwood ([link](https://dhdebates.gc.cuny.edu/read/untitled/section/3b96956c-aab2-4037-9894-dc4ff9aa1ec5##ch44))
+
+##  {.center}
+
+> The tools we're going to need are not usually specific to the humanities. But the corpora often are. [Ted Underwood]{.cite}
+
+## Disadvantages of name
+
+-   newish name makes practice seem new
+    -   (but it isn't new)
+-   "reading" makes seem limited to literary studies
+    -   (but it shouldn't be)
+
+## Principles to emphasize
+
+-   Literary scholars don't know much at big scale.
+-   Best to adopt methods from other disciplines.
+-   Must get access to material to study it.
+
+##  {.center .text-title}
+
+"More Scale, More Questions: Observations from Sociology"
+
+by Tressie McMillan Cottom ([link](https://dhdebates.gc.cuny.edu/read/untitled/section/55e48b34-543a-41f7-97c9-8c8643bf8844##ch47))
+
+##  {.center}
+
+> it is important to ask what it means when distant reading or quantitative textual analysis does not theorize the power relations of financial actors or the social construction of race in computational models or analytical frameworks. Without that lens I suspect that we get a quantitative textual analysis that is very popular with powerful actors precisely because it does not theorize power relations. [Tressie McMillan Cottom]{.cite}
+
+## Lessons and takeaways
+
+-   adding scale should also raise questions
+    -   system that makes scaling possible
+    -   political choice inspired by system of power
+-   interpretation still needed
+-   sociological methods = much contextualizing
